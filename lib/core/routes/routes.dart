@@ -1,197 +1,164 @@
 // lib/core/routes/routes.dart
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../presentation/screens/authentication/forget_password.dart';
+import '../../presentation/screens/authentication/forget_password_otp.dart';
+import '../../presentation/screens/authentication/login.dart';
+import '../../presentation/screens/authentication/reset_password.dart';
+import '../../presentation/screens/authentication/reset_password_success.dart';
+import '../../presentation/screens/documents_screen/documents.dart';
+import '../../presentation/screens/home/home.dart';
+import '../../presentation/screens/legal_entry_basic/destination.dart';
+import '../../presentation/screens/massage_screen/massage_screen.dart';
+import '../../presentation/screens/settings/settings.dart';
+import '../../presentation/screens/splash/splash.dart';
 import 'route_observer.dart';
 import 'route_path.dart';
 
 class AppRouter {
   static final GoRouter initRoute = GoRouter(
-    initialLocation: RoutePath.splashScreen.addBasePath,
+    initialLocation: RoutePath.splash.addBasePath,
     debugLogDiagnostics: true,
     routes: [
 
-      /// Onboarding
+      // ================== OnBoarding ==================
       GoRoute(
-        name: RoutePath.splashScreen,
-        path: RoutePath.splashScreen.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.onBoarding1,
-        path: RoutePath.onBoarding1.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.onBoarding2,
-        path: RoutePath.onBoarding2.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.splash,
+        path: RoutePath.splash.addBasePath,
+        builder: (context, state) => const SplashScreen(),
       ),
 
-      /// Authentication
+      // ================== Authentication ==================
       GoRoute(
-        name: RoutePath.enterEmail,
-        path: RoutePath.enterEmail.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.login,
+        path: RoutePath.login.addBasePath,
+        builder: (context, state) => const LoginScreen(),
       ),
       GoRoute(
-        name: RoutePath.verifyCode,
-        path: RoutePath.verifyCode.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.forgetPassword,
+        path: RoutePath.forgetPassword.addBasePath,
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       GoRoute(
-        name: RoutePath.privacyPolicyAuth,
-        path: RoutePath.privacyPolicyAuth.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.forgetPasswordOtp,
+        path: RoutePath.forgetPasswordOtp.addBasePath,
+        builder: (context, state) => const OtpVerificationScreen(),
       ),
       GoRoute(
-        name: RoutePath.termsAndConditionAuth,
-        path: RoutePath.termsAndConditionAuth.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-
-      /// Profile Setup
-      GoRoute(
-        name: RoutePath.profileSetup1,
-        path: RoutePath.profileSetup1.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.resetPassword,
+        path: RoutePath.resetPassword.addBasePath,
+        builder: (context, state) => const ResetPasswordScreen(),
       ),
       GoRoute(
-        name: RoutePath.profileSetup2,
-        path: RoutePath.profileSetup2.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.profileSetup3,
-        path: RoutePath.profileSetup3.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.profileSetup4,
-        path: RoutePath.profileSetup4.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.profileSetup5,
-        path: RoutePath.profileSetup5.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.profileSetup6,
-        path: RoutePath.profileSetup6.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.privacyPolicyPs,
-        path: RoutePath.privacyPolicyPs.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.resetPasswordSuccess,
+        path: RoutePath.resetPasswordSuccess.addBasePath,
+        builder: (context, state) => const PasswordResetSuccessScreen(),
       ),
 
-      /// Home
+      // ================== Home ==================
       GoRoute(
         name: RoutePath.home,
         path: RoutePath.home.addBasePath,
+        builder: (context, state) => const HomeScreen(),
+      ),
+
+      // ================== Legal Entry Basic ==================
+      GoRoute(
+        name: RoutePath.destination,
+        path: RoutePath.destination.addBasePath,
+        builder: (context, state) => const DestinationScreen(),
+      ),
+
+      // ================== Documents ==================
+      GoRoute(
+        name: RoutePath.documents,
+        path: RoutePath.documents.addBasePath,
+        builder: (context, state) => const DocumentsScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.preliminary,
+        path: RoutePath.preliminary.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
-        name: RoutePath.favourites,
-        path: RoutePath.favourites.addBasePath,
+        name: RoutePath.student,
+        path: RoutePath.student.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
-        name: RoutePath.activity,
-        path: RoutePath.activity.addBasePath,
+        name: RoutePath.country,
+        path: RoutePath.country.addBasePath,
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        name: RoutePath.passport,
+        path: RoutePath.passport.addBasePath,
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        name: RoutePath.scanner,
+        path: RoutePath.scanner.addBasePath,
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        name: RoutePath.edit,
+        path: RoutePath.edit.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
 
-      /// Scan Menu
+      // ================== Massage ==================
       GoRoute(
-        name: RoutePath.scanMenu,
-        path: RoutePath.scanMenu.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.body,
-        path: RoutePath.body.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.scanResultAll,
-        path: RoutePath.scanResultAll.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.scanResultSafe,
-        path: RoutePath.scanResultSafe.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.scanResultModify,
-        path: RoutePath.scanResultModify.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.scanResultAvoid,
-        path: RoutePath.scanResultAvoid.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.scanResultBuildMyPlate,
-        path: RoutePath.scanResultBuildMyPlate.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.scanResultOrderingTips,
-        path: RoutePath.scanResultOrderingTips.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.scanResultSaveYourMeals,
-        path: RoutePath.scanResultSaveYourMeals.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-      GoRoute(
-        name: RoutePath.myQrCode,
-        path: RoutePath.myQrCode.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.massageScreen,
+        path: RoutePath.massageScreen.addBasePath,
+        builder: (context, state) => const MessageScreen(),
       ),
 
-      /// Chat Bot
+      // ================== Settings ==================
       GoRoute(
-        name: RoutePath.askChatBot,
-        path: RoutePath.askChatBot.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
-
-      /// Profile & Settings
-      GoRoute(
-        name: RoutePath.myProfile,
-        path: RoutePath.myProfile.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.settings,
+        path: RoutePath.settings.addBasePath,
+        builder: (context, state) => const SettingsScreen(),
       ),
       GoRoute(
-        name: RoutePath.switchProfile,
-        path: RoutePath.switchProfile.addBasePath,
+        name: RoutePath.myInformation,
+        path: RoutePath.myInformation.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
-        name: RoutePath.editProfile,
-        path: RoutePath.editProfile.addBasePath,
+        name: RoutePath.studentInformation,
+        path: RoutePath.studentInformation.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
-        name: RoutePath.notification,
-        path: RoutePath.notification.addBasePath,
+        name: RoutePath.address,
+        path: RoutePath.address.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
-        name: RoutePath.helpAndSupport,
-        path: RoutePath.helpAndSupport.addBasePath,
+        name: RoutePath.addAddress,
+        path: RoutePath.addAddress.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
-        name: RoutePath.accountSettings,
-        path: RoutePath.accountSettings.addBasePath,
+        name: RoutePath.email,
+        path: RoutePath.email.addBasePath,
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        name: RoutePath.addEmail,
+        path: RoutePath.addEmail.addBasePath,
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        name: RoutePath.phone,
+        path: RoutePath.phone.addBasePath,
+        builder: (context, state) => const Placeholder(),
+      ),
+      GoRoute(
+        name: RoutePath.addPhone,
+        path: RoutePath.addPhone.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
@@ -200,8 +167,8 @@ class AppRouter {
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
-        name: RoutePath.termsAndCondition,
-        path: RoutePath.termsAndCondition.addBasePath,
+        name: RoutePath.technicalSupport,
+        path: RoutePath.technicalSupport.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
       GoRoute(
@@ -209,16 +176,11 @@ class AppRouter {
         path: RoutePath.privacyPolicy.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
-      GoRoute(
-        name: RoutePath.aboutUs,
-        path: RoutePath.aboutUs.addBasePath,
-        builder: (context, state) => const Placeholder(),
-      ),
 
-      /// Subscription
+      // ================== Notification ==================
       GoRoute(
-        name: RoutePath.subscription,
-        path: RoutePath.subscription.addBasePath,
+        name: RoutePath.notification,
+        path: RoutePath.notification.addBasePath,
         builder: (context, state) => const Placeholder(),
       ),
     ],
