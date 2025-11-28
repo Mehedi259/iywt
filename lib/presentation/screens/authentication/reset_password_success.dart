@@ -1,7 +1,9 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:iywt/core/routes/routes.dart';
+
+import '../../../core/custom_assets/assets.gen.dart';
+import '../../../core/routes/route_path.dart';
 
 class PasswordResetSuccessScreen extends StatelessWidget {
   const PasswordResetSuccessScreen({super.key});
@@ -9,80 +11,83 @@ class PasswordResetSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFDFDFD),
       body: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 24.w),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(height: 20.h),
+              const SizedBox(height: 20),
 
               // Back Button
               GestureDetector(
-                onTap: () => context.go('/login'),
-                child: Container(
-                  width: 48.w,
-                  height: 48.h,
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8F0FE),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.arrow_back,
-                    color: const Color(0xFF5B7FBF),
-                    size: 24.sp,
-                  ),
+                onTap: () {
+                  // Navigate to login
+                  // context.go('/login');
+                  Navigator.of(context).pop();
+                },
+                child: Assets.images.backIcon.image(
+                  width: 44,
+                  height: 44,
                 ),
               ),
 
-              SizedBox(height: 40.h),
+              const SizedBox(height: 32),
 
               // Title
-              Text(
+              const Text(
                 'Password reset',
                 style: TextStyle(
-                  fontSize: 28.sp,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
+                  color: Color(0xFF1D1B20),
+                  fontSize: 18,
+                  fontFamily: 'Nunito Sans',
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.50,
                 ),
               ),
 
-              SizedBox(height: 12.h),
+              const SizedBox(height: 12),
 
               // Subtitle
-              Text(
-                'Please check your email for a link to reset your password.',
+              const Text(
+                'Your password has been successfully reset. Click below to log in',
                 style: TextStyle(
-                  fontSize: 15.sp,
-                  color: Colors.grey.shade500,
-                  height: 1.4,
+                  color: Color(0xFFC7C7C7),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400,
+                  height: 1.43,
+                  letterSpacing: -0.50,
                 ),
               ),
 
-              SizedBox(height: 40.h),
+              const SizedBox(height: 40),
+
 
               // Return to Login Button
               SizedBox(
                 width: double.infinity,
-                height: 56.h,
+                height: 44,
                 child: ElevatedButton(
-                  onPressed: () {
-                    context.go('/login');
-                  },
+                  onPressed: () => context.go(RoutePath.login.addBasePath),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5B7FBF),
-                    foregroundColor: Colors.white,
+                    backgroundColor: const Color(0xFF375BA4),
+                    foregroundColor: const Color(0xFFFDFDFD),
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12.r),
+                      borderRadius: BorderRadius.circular(12),
+                      side: const BorderSide(
+                        width: 1,
+                        color: Color(0xFF375BA4),
+                      ),
                     ),
                   ),
-                  child: Text(
+                  child: const Text(
                     'Return to Login',
                     style: TextStyle(
-                      fontSize: 18.sp,
-                      fontWeight: FontWeight.w600,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.50,
                     ),
                   ),
                 ),

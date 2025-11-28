@@ -8,11 +8,28 @@ import '../../presentation/screens/authentication/forget_password_otp.dart';
 import '../../presentation/screens/authentication/login.dart';
 import '../../presentation/screens/authentication/reset_password.dart';
 import '../../presentation/screens/authentication/reset_password_success.dart';
+import '../../presentation/screens/documents_screen/country.dart';
 import '../../presentation/screens/documents_screen/documents.dart';
+import '../../presentation/screens/documents_screen/passport.dart';
+import '../../presentation/screens/documents_screen/preliminary.dart';
+import '../../presentation/screens/documents_screen/scanner.dart';
+import '../../presentation/screens/documents_screen/student.dart';
 import '../../presentation/screens/home/home.dart';
 import '../../presentation/screens/legal_entry_basic/destination.dart';
 import '../../presentation/screens/massage_screen/massage_screen.dart';
+import '../../presentation/screens/notification/notification.dart';
 import '../../presentation/screens/settings/settings.dart';
+import '../../presentation/screens/settings/my_information.dart';
+import '../../presentation/screens/settings/student_information.dart';
+import '../../presentation/screens/settings/address.dart';
+import '../../presentation/screens/settings/add_address.dart';
+import '../../presentation/screens/settings/email.dart';
+import '../../presentation/screens/settings/add_email.dart';
+import '../../presentation/screens/settings/phone.dart';
+import '../../presentation/screens/settings/add_phone.dart';
+import '../../presentation/screens/settings/change_password.dart';
+import '../../presentation/screens/settings/technical_support.dart';
+import '../../presentation/screens/settings/privacy_policy.dart';
 import '../../presentation/screens/splash/splash.dart';
 import 'route_observer.dart';
 import 'route_path.dart';
@@ -80,27 +97,27 @@ class AppRouter {
       GoRoute(
         name: RoutePath.preliminary,
         path: RoutePath.preliminary.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const PreliminaryScreen(),
       ),
       GoRoute(
         name: RoutePath.student,
         path: RoutePath.student.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const StudentScreen(),
       ),
       GoRoute(
         name: RoutePath.country,
         path: RoutePath.country.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const CountryScreen(),
       ),
       GoRoute(
         name: RoutePath.passport,
         path: RoutePath.passport.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const PassportScreen(),
       ),
       GoRoute(
         name: RoutePath.scanner,
         path: RoutePath.scanner.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const ScannerScreen(),
       ),
       GoRoute(
         name: RoutePath.edit,
@@ -124,64 +141,64 @@ class AppRouter {
       GoRoute(
         name: RoutePath.myInformation,
         path: RoutePath.myInformation.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const MyInformationScreen(),
       ),
       GoRoute(
         name: RoutePath.studentInformation,
         path: RoutePath.studentInformation.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const StudentInformationScreen(),
       ),
       GoRoute(
         name: RoutePath.address,
         path: RoutePath.address.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const AddressScreen(),
       ),
       GoRoute(
         name: RoutePath.addAddress,
         path: RoutePath.addAddress.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const AddAddressScreen(),
       ),
       GoRoute(
         name: RoutePath.email,
         path: RoutePath.email.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const EmailScreen(),
       ),
       GoRoute(
         name: RoutePath.addEmail,
         path: RoutePath.addEmail.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const AddEmailScreen(),
       ),
       GoRoute(
         name: RoutePath.phone,
         path: RoutePath.phone.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const PhoneScreen(),
       ),
       GoRoute(
         name: RoutePath.addPhone,
         path: RoutePath.addPhone.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const AddPhoneScreen(),
       ),
       GoRoute(
         name: RoutePath.changePassword,
         path: RoutePath.changePassword.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const ChangePasswordScreen(),
       ),
       GoRoute(
         name: RoutePath.technicalSupport,
         path: RoutePath.technicalSupport.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const TechnicalSupportScreen(),
       ),
       GoRoute(
         name: RoutePath.privacyPolicy,
         path: RoutePath.privacyPolicy.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const PrivacyPolicyScreen(),
       ),
 
       // ================== Notification ==================
       GoRoute(
         name: RoutePath.notification,
         path: RoutePath.notification.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        builder: (context, state) => const NotificationsScreen(),
       ),
     ],
     observers: [routeObserver],

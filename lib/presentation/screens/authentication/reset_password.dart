@@ -2,6 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:iywt/core/routes/routes.dart';
+
+import '../../../core/custom_assets/assets.gen.dart';
+import '../../../core/routes/route_path.dart';
 
 class ResetPasswordScreen extends StatefulWidget {
   const ResetPasswordScreen({super.key});
@@ -64,94 +68,94 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFDFDFD),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 24.w),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: 20.h),
+                  const SizedBox(height: 20),
 
                   // Back Button
                   GestureDetector(
-                    onTap: () => context.pop(),
-                    child: Container(
-                      width: 48.w,
-                      height: 48.h,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFE8F0FE),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.arrow_back,
-                        color: const Color(0xFF5B7FBF),
-                        size: 24.sp,
-                      ),
+                    onTap: () => Navigator.of(context).pop(),
+                    child: Assets.images.backIcon.image(
+                      width: 44,
+                      height: 44,
                     ),
                   ),
 
-                  SizedBox(height: 40.h),
+                  const SizedBox(height: 32),
 
                   // Title
-                  Text(
+                  const Text(
                     'Reset Password',
                     style: TextStyle(
-                      fontSize: 28.sp,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
+                      color: Color(0xFF1D1B20),
+                      fontSize: 18,
+                      fontFamily: 'Nunito Sans',
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.50,
                     ),
                   ),
 
-                  SizedBox(height: 12.h),
+                  const SizedBox(height: 12),
 
                   // Subtitle
-                  Text(
+                  const Text(
                     'Set the new password for your account so you can login and access all the features',
                     style: TextStyle(
-                      fontSize: 15.sp,
-                      color: Colors.grey.shade500,
-                      height: 1.4,
+                      color: Color(0xFFC7C7C7),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                      height: 1.43,
+                      letterSpacing: -0.50,
                     ),
                   ),
 
-                  SizedBox(height: 40.h),
+                  const SizedBox(height: 36),
 
                   // New Password Label
-                  Text(
+                  const Text(
                     'New Password',
                     style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: Color(0xFF1D1B20),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
 
-                  SizedBox(height: 12.h),
+                  const SizedBox(height: 18),
 
                   // New Password Field
                   TextFormField(
                     controller: _newPasswordController,
                     obscureText: _obscureNewPassword,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.black,
+                    style: const TextStyle(
+                      color: Color(0xFF1D1B20),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -0.50,
                     ),
                     decoration: InputDecoration(
                       hintText: 'Enter new password',
-                      hintStyle: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.grey.shade400,
+                      hintStyle: const TextStyle(
+                        color: Color(0xFFC7C7C7),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: -0.50,
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscureNewPassword
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
-                          color: Colors.grey.shade600,
+                          color: const Color(0xFFC7C7C7),
+                          size: 20,
                         ),
                         onPressed: () {
                           setState(() {
@@ -159,99 +163,104 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           });
                         },
                       ),
-                      enabledBorder: UnderlineInputBorder(
+                      enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                          width: 1.5,
+                          color: Color(0xFFC7C7C7),
+                          width: 0.50,
                         ),
                       ),
-                      focusedBorder: UnderlineInputBorder(
+                      focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: const Color(0xFF5B7FBF),
-                          width: 2,
+                          color: Color(0xFF375BA4),
+                          width: 1.0,
                         ),
                       ),
-                      errorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.red.shade300,
-                          width: 1.5,
-                        ),
-                      ),
-                      focusedErrorBorder: UnderlineInputBorder(
+                      errorBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Colors.red,
-                          width: 2,
+                          width: 0.50,
                         ),
                       ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                      focusedErrorBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.only(bottom: 12, right: 8),
                     ),
                   ),
 
-                  SizedBox(height: 20.h),
+                  const SizedBox(height: 20),
 
                   // Password Requirements
                   _buildPasswordRequirement(
                     'At least 8 characters',
                     _hasMinLength,
                   ),
-                  SizedBox(height: 8.h),
+                  const SizedBox(height: 8),
                   _buildPasswordRequirement(
                     'Must contain one uppercase letter',
                     _hasUppercase,
                   ),
-                  SizedBox(height: 8.h),
+                  const SizedBox(height: 8),
                   _buildPasswordRequirement(
                     'Must contain one lowercase letter',
                     _hasLowercase,
                   ),
-                  SizedBox(height: 8.h),
+                  const SizedBox(height: 8),
                   _buildPasswordRequirement(
                     'Must contain one number',
                     _hasNumber,
                   ),
-                  SizedBox(height: 8.h),
+                  const SizedBox(height: 8),
                   _buildPasswordRequirement(
                     'Must contain one special character',
                     _hasSpecialChar,
                   ),
 
-                  SizedBox(height: 32.h),
+                  const SizedBox(height: 32),
 
                   // Confirm Password Label
-                  Text(
+                  const Text(
                     'Confirm Password',
                     style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black,
+                      color: Color(0xFF1D1B20),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
 
-                  SizedBox(height: 12.h),
+                  const SizedBox(height: 18),
 
                   // Confirm Password Field
                   TextFormField(
                     controller: _confirmPasswordController,
                     obscureText: _obscureConfirmPassword,
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      color: Colors.black,
+                    style: const TextStyle(
+                      color: Color(0xFF1D1B20),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      letterSpacing: -0.50,
                     ),
                     onChanged: (value) {
                       setState(() {});
                     },
                     decoration: InputDecoration(
                       hintText: 'Re-enter password',
-                      hintStyle: TextStyle(
-                        fontSize: 16.sp,
-                        color: Colors.grey.shade400,
+                      hintStyle: const TextStyle(
+                        color: Color(0xFFC7C7C7),
+                        fontSize: 16,
+                        fontWeight: FontWeight.w400,
+                        letterSpacing: -0.50,
                       ),
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscureConfirmPassword
                               ? Icons.visibility_outlined
                               : Icons.visibility_off_outlined,
-                          color: Colors.grey.shade600,
+                          color: const Color(0xFFC7C7C7),
+                          size: 20,
                         ),
                         onPressed: () {
                           setState(() {
@@ -259,31 +268,31 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                           });
                         },
                       ),
-                      enabledBorder: UnderlineInputBorder(
+                      enabledBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: Colors.grey.shade300,
-                          width: 1.5,
+                          color: Color(0xFFC7C7C7),
+                          width: 0.50,
                         ),
                       ),
-                      focusedBorder: UnderlineInputBorder(
+                      focusedBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
-                          color: const Color(0xFF5B7FBF),
-                          width: 2,
+                          color: Color(0xFF375BA4),
+                          width: 1.0,
                         ),
                       ),
-                      errorBorder: UnderlineInputBorder(
-                        borderSide: BorderSide(
-                          color: Colors.red.shade300,
-                          width: 1.5,
-                        ),
-                      ),
-                      focusedErrorBorder: UnderlineInputBorder(
+                      errorBorder: const UnderlineInputBorder(
                         borderSide: BorderSide(
                           color: Colors.red,
-                          width: 2,
+                          width: 0.50,
                         ),
                       ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 12.h),
+                      focusedErrorBorder: const UnderlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Colors.red,
+                          width: 1.0,
+                        ),
+                      ),
+                      contentPadding: const EdgeInsets.only(bottom: 12, right: 8),
                     ),
                     validator: (value) {
                       if (value != _newPasswordController.text) {
@@ -293,42 +302,53 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
                     },
                   ),
 
-                  SizedBox(height: 40.h),
+                  const SizedBox(height: 40),
 
                   // Reset Password Button
                   SizedBox(
                     width: double.infinity,
-                    height: 56.h,
+                    height: 44,
                     child: ElevatedButton(
                       onPressed: _canSubmit
                           ? () {
                         if (_formKey.currentState!.validate()) {
                           // Handle password reset
-                          context.go('/resetPasswordSuccess');
+                          context.go(RoutePath.resetPasswordSuccess.addBasePath);
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Password reset successfully!'),
+                              backgroundColor: Color(0xFF375BA4),
+                            ),
+                          );
                         }
                       }
                           : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF5B7FBF),
-                        disabledBackgroundColor: const Color(0xFFB3C5E0),
-                        foregroundColor: Colors.white,
-                        disabledForegroundColor: Colors.white,
+                        backgroundColor: const Color(0xFF375BA4),
+                        disabledBackgroundColor: const Color(0x7F375BA4),
+                        foregroundColor: const Color(0xFFFDFDFD),
+                        disabledForegroundColor: const Color(0xFFFDFDFD),
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12.r),
+                          borderRadius: BorderRadius.circular(12),
+                          side: const BorderSide(
+                            width: 1,
+                            color: Color(0xFF375BA4),
+                          ),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         'Reset Password',
                         style: TextStyle(
-                          fontSize: 18.sp,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: -0.50,
                         ),
                       ),
                     ),
                   ),
 
-                  SizedBox(height: 40.h),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),
@@ -343,16 +363,17 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       children: [
         Icon(
           isMet ? Icons.check_circle : Icons.circle_outlined,
-          color: isMet ? Colors.green : Colors.grey.shade400,
-          size: 18.sp,
+          color: isMet ? const Color(0xFF4CAF50) : const Color(0xFFC7C7C7),
+          size: 18,
         ),
-        SizedBox(width: 8.w),
+        const SizedBox(width: 8),
         Text(
           text,
           style: TextStyle(
-            fontSize: 14.sp,
-            color: isMet ? Colors.green : Colors.grey.shade600,
+            fontSize: 14,
+            color: isMet ? const Color(0xFF4CAF50) : const Color(0xFFC7C7C7),
             fontWeight: isMet ? FontWeight.w500 : FontWeight.normal,
+            letterSpacing: -0.50,
           ),
         ),
       ],

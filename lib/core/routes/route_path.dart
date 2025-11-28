@@ -1,4 +1,4 @@
-
+//lib/core/routes/route_path.dart
 class RoutePath {
   static const String basePath = '/';
 

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iywt/core/routes/routes.dart';
+import '../../../core/routes/route_path.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
+import '../../../core/custom_assets/assets.gen.dart';
 
 enum DocumentStatus { complete, incomplete, warning }
 
@@ -9,14 +13,15 @@ class DocumentsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFFDFDFD),
       appBar: AppBar(
         title: const Text(
           'Documents',
           style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
+            fontSize: 18,
+            fontFamily: 'Nunito Sans',
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1D1B20),
           ),
         ),
         backgroundColor: Colors.white,
@@ -24,32 +29,47 @@ class DocumentsScreen extends StatelessWidget {
         centerTitle: true,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.fromLTRB(20, 48, 20, 0),
         child: Column(
           children: [
             _buildDocumentCard(
+              context: context,
               title: 'Preliminary',
-              icon: Icons.description,
+              onTap: () => context.go(RoutePath.preliminary.addBasePath),
+              iconImage: Assets.images.preliminary.provider(),
+              iconSize: 38.16,
+              iconLeft: 7,
+              iconTop: 7.38,
               progress: 5,
               total: 5,
               status: DocumentStatus.complete,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12.91),
             _buildDocumentCard(
+              context: context,
               title: 'Student',
-              icon: Icons.school,
+              onTap: () => context.go(RoutePath.student.addBasePath),
+              iconImage: Assets.images.student.provider(),
+              iconSize: 36,
+              iconLeft: 6,
+              iconTop: 6.55,
               progress: 3,
               total: 5,
               status: DocumentStatus.incomplete,
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12.91),
             _buildDocumentCard(
+              context: context,
               title: 'Country',
-              icon: Icons.flag,
+              onTap: () => context.go(RoutePath.country.addBasePath),
+              iconImage: Assets.images.country.provider(),
+              iconSize: 36,
+              iconLeft: 7,
+              iconTop: 7,
               progress: 2,
               total: 5,
               status: DocumentStatus.warning,
-              flagUrl: 'https://flagcdn.com/w40/ro.png',
+              isCountryFlag: true,
             ),
           ],
         ),
@@ -59,91 +79,153 @@ class DocumentsScreen extends StatelessWidget {
   }
 
   Widget _buildDocumentCard({
+    required BuildContext context,
     required String title,
-    required IconData icon,
+    required ImageProvider iconImage,
+    required double iconSize,
+    required double iconLeft,
+    required double iconTop,
     required int progress,
     required int total,
     required DocumentStatus status,
-    String? flagUrl,
+    required VoidCallback onTap,
+    bool isCountryFlag = false,
   }) {
-    Color statusColor;
-    IconData statusIcon;
+    // Calculate positions based on Figma design
+    double cardTop = 0;
+    double titleTop = 0;
+    double iconContainerTop = 0;
+    double progressTop = 0;
+    double statusIconTop = 0;
+    double chevronTop = 0;
 
-    switch (status) {
-      case DocumentStatus.complete:
-        statusColor = Colors.green;
-        statusIcon = Icons.check_circle;
-        break;
-      case DocumentStatus.incomplete:
-        statusColor = Colors.red;
-        statusIcon = Icons.cancel;
-        break;
-      case DocumentStatus.warning:
-        statusColor = Colors.orange;
-        statusIcon = Icons.warning;
-        break;
+    if (title == 'Preliminary') {
+      cardTop = 132;
+      titleTop = 201;
+      iconContainerTop = 148.62;
+      progressTop = 181;
+      statusIconTop = 182;
+      chevronTop = 180;
+    } else if (title == 'Student') {
+      cardTop = 264;
+      titleTop = 334.55;
+      iconContainerTop = 283.55;
+      progressTop = 313;
+      statusIconTop = 316;
+      chevronTop = 312;
+    } else if (title == 'Country') {
+      cardTop = 396;
+      titleTop = 463;
+      iconContainerTop = 414;
+      progressTop = 445;
+      statusIconTop = 448;
+      chevronTop = 444;
     }
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 56,
-            height: 56,
-            decoration: const BoxDecoration(
-              color: Color(0xFF5B7FBF),
-              shape: BoxShape.circle,
-            ),
-            child: flagUrl != null
-                ? ClipOval(
-              child: Image.network(
-                flagUrl,
-                fit: BoxFit.cover,
-              ),
-            )
-                : Icon(icon, color: Colors.white, size: 28),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-                color: Colors.black,
-              ),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Icon(statusIcon, color: statusColor, size: 28),
-              const SizedBox(height: 4),
-              Text(
-                '$progress/$total',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.grey.shade400,
-                  fontWeight: FontWeight.w500,
+    // Status icon
+    ImageProvider? statusImage;
+    double statusIconSize = 20;
+    if (status == DocumentStatus.complete) {
+      statusImage = Assets.images.correct.provider();
+    } else if (status == DocumentStatus.warning) {
+      statusImage = Assets.images.alert.provider();
+      statusIconSize = 16;
+    }else if (status == DocumentStatus.incomplete) {
+      statusImage = Assets.images.cross.provider();
+      statusIconSize = 16;
+    }
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 353,
+        height: 119.09,
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F5F7),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Stack(
+          children: [
+            // Icon Container
+            Positioned(
+              left: 26,
+              top: iconContainerTop - cardTop,
+              child: Container(
+                width: iconSize,
+                height: iconSize,
+                decoration: BoxDecoration(
+                  color: isCountryFlag ? const Color(0xFFF5F5F7) : const Color(0xFF375BA4),
+                  shape: BoxShape.circle,
                 ),
               ),
-            ],
-          ),
-          const SizedBox(width: 8),
-          Icon(Icons.chevron_right, color: Colors.grey.shade400, size: 24),
-        ],
+            ),
+            // Icon Image
+            Positioned(
+              left: 26 + iconLeft,
+              top: iconContainerTop - cardTop + iconTop,
+              child: SizedBox(
+                width: 24,
+                height: 24,
+                child: Image(
+                  image: iconImage,
+                  fit: BoxFit.contain,
+                ),
+              ),
+            ),
+            // Title
+            Positioned(
+              left: 26,
+              top: titleTop - cardTop,
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1D1B20),
+                ),
+              ),
+            ),
+            // Status Icon (if exists)
+            if (statusImage != null)
+              Positioned(
+                left: 261,
+                top: statusIconTop - cardTop,
+                child: SizedBox(
+                  width: statusIconSize,
+                  height: statusIconSize,
+                  child: Image(
+                    image: statusImage,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+            // Progress Text
+            Positioned(
+              left: title == 'Preliminary' ? 291 : 287,
+              top: progressTop - cardTop,
+              child: Text(
+                '$progress/$total',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontFamily: 'Inter',
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFFC7C7C7),
+                ),
+              ),
+            ),
+            // Chevron
+            Positioned(
+              left: title == 'Preliminary' ? 329 : 325,
+              top: chevronTop - cardTop,
+              child: const Icon(
+                Icons.chevron_right,
+                color: Color(0xFFC7C7C7),
+                size: 24,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

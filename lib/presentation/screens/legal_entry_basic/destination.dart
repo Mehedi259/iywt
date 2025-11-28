@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
+import '../../../core/custom_assets/assets.gen.dart';
 
 class DestinationScreen extends StatelessWidget {
   const DestinationScreen({super.key});
@@ -27,34 +28,31 @@ class DestinationScreen extends StatelessWidget {
           children: [
             _buildCountrySummaryCard(),
             const SizedBox(height: 16),
+
+            // Expandable Cards with images only
             _buildExpandableCard(
-              icon: Icons.calendar_today,
+              image: Assets.images.importantDates.provider(),
               title: 'Important Dates',
-              color: const Color(0xFF5B7FBF),
             ),
             const SizedBox(height: 12),
             _buildExpandableCard(
-              icon: Icons.upload_file,
+              image: Assets.images.instructionForDocumentSubmission.provider(),
               title: 'Instructions for Document\nSubmission',
-              color: const Color(0xFF5B7FBF),
             ),
             const SizedBox(height: 12),
             _buildExpandableCard(
-              icon: Icons.location_city,
+              image: Assets.images.consulateOrOtherVisits.provider(),
               title: 'Consulate or Other Visits',
-              color: const Color(0xFF5B7FBF),
             ),
             const SizedBox(height: 12),
             _buildExpandableCard(
-              icon: Icons.lightbulb_outline,
+              image: Assets.images.importantNotes.provider(),
               title: 'Important Notes',
-              color: const Color(0xFF5B7FBF),
             ),
             const SizedBox(height: 12),
             _buildExpandableCard(
-              icon: Icons.flight_land,
+              image: Assets.images.postArrivalinstructions.provider(),
               title: 'Post Arrival Instructions',
-              color: const Color(0xFF5B7FBF),
             ),
           ],
         ),
@@ -63,6 +61,7 @@ class DestinationScreen extends StatelessWidget {
     );
   }
 
+  // Country Summary Card
   Widget _buildCountrySummaryCard() {
     return Container(
       decoration: BoxDecoration(
@@ -87,15 +86,14 @@ class DestinationScreen extends StatelessWidget {
             ),
             child: Row(
               children: [
+                // Country Flag
                 Container(
-                  width: 32,
+                  width: 24,
                   height: 24,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(4),
-                    image: const DecorationImage(
-                      image: NetworkImage(
-                        'https://flagcdn.com/w40/ro.png',
-                      ),
+                    image: DecorationImage(
+                      image: Assets.images.country.provider(),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -114,6 +112,8 @@ class DestinationScreen extends StatelessWidget {
               ],
             ),
           ),
+
+          // Body
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
@@ -128,15 +128,17 @@ class DestinationScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
+
+                // Background Image
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    'https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=600',
+                  child: Assets.images.countrySummeryImage.image(
                     height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,
                   ),
                 ),
+
                 const SizedBox(height: 16),
                 const Text(
                   'Key Facts:',
@@ -158,6 +160,7 @@ class DestinationScreen extends StatelessWidget {
     );
   }
 
+  // Key Fact Row
   Widget _buildKeyFact(String text) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -188,10 +191,10 @@ class DestinationScreen extends StatelessWidget {
     );
   }
 
+  // Expandable Card (Image only)
   Widget _buildExpandableCard({
-    required IconData icon,
     required String title,
-    required Color color,
+    required ImageProvider image,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -208,7 +211,14 @@ class DestinationScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(icon, color: color, size: 24),
+          Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(4),
+              image: DecorationImage(image: image, fit: BoxFit.cover),
+            ),
+          ),
           const SizedBox(width: 12),
           Expanded(
             child: Text(

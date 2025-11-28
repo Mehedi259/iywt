@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../core/custom_assets/assets.gen.dart';
 
 class CustomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -12,7 +13,7 @@ class CustomNavBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 70,  // fixed height instead of 70.h
+      height: 70,
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -28,41 +29,36 @@ class CustomNavBar extends StatelessWidget {
         children: [
           _buildNavItem(
             context: context,
-            icon: Icons.home_outlined,
-            activeIcon: Icons.home,
-            label: 'Home',
+            activeIcon: Assets.images.homeActive.path,
+            inactiveIcon: Assets.images.homeInactive.path,
             index: 0,
             route: '/home',
           ),
           _buildNavItem(
             context: context,
-            icon: Icons.airplane_ticket_outlined,
-            activeIcon: Icons.airplane_ticket,
-            label: 'Destination',
+            activeIcon: Assets.images.destinationActive.path,
+            inactiveIcon: Assets.images.destinationInactive.path,
             index: 1,
             route: '/destination',
           ),
           _buildNavItem(
             context: context,
-            icon: Icons.description_outlined,
-            activeIcon: Icons.description,
-            label: 'Documents',
+            activeIcon: Assets.images.documentsActive.path,
+            inactiveIcon: Assets.images.documentsInactive.path,
             index: 2,
             route: '/documents',
           ),
           _buildNavItem(
             context: context,
-            icon: Icons.message_outlined,
-            activeIcon: Icons.message,
-            label: 'Messages',
+            activeIcon: Assets.images.massageActive.path,
+            inactiveIcon: Assets.images.massageInactive.path,
             index: 3,
             route: '/massageScreen',
           ),
           _buildNavItem(
             context: context,
-            icon: Icons.person_outline,
-            activeIcon: Icons.person,
-            label: 'Profile',
+            activeIcon: Assets.images.profileActive.path,
+            inactiveIcon: Assets.images.profileInactive.path,
             index: 4,
             route: '/settings',
           ),
@@ -73,9 +69,8 @@ class CustomNavBar extends StatelessWidget {
 
   Widget _buildNavItem({
     required BuildContext context,
-    required IconData icon,
-    required IconData activeIcon,
-    required String label,
+    required String activeIcon,
+    required String inactiveIcon,
     required int index,
     required String route,
   }) {
@@ -87,26 +82,12 @@ class CustomNavBar extends StatelessWidget {
           context.go(route);
         }
       },
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              isActive ? activeIcon : icon,
-              color: isActive ? const Color(0xFF5B7FBF) : Colors.grey.shade400,
-              size: 26,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 11,
-                color: isActive ? const Color(0xFF5B7FBF) : Colors.grey.shade400,
-                fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        child: Image.asset(
+          isActive ? activeIcon : inactiveIcon,
+          width: 28,
+          height: 28,
         ),
       ),
     );

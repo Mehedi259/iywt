@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+
+import '../../../core/custom_assets/assets.gen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 2000),
+      duration: const Duration(milliseconds: 5000),
       vsync: this,
     );
 
@@ -39,8 +40,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    // Show login bottom sheet after animation
-    Future.delayed(const Duration(milliseconds: 2500), () {
+    Future.delayed(const Duration(milliseconds: 5000), () {
       if (mounted) {
         context.push('/login');
       }
@@ -56,29 +56,26 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: const Color(0xFF1D1B20),
       body: Stack(
         children: [
-          // Background gradient
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  const Color(0xFF1A1A1A),
-                  const Color(0xFF2D2D2D),
-                  const Color(0xFF1A1A1A),
-                ],
+          // Background Image (large circular background)
+          Positioned(
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(Assets.images.splashScreenBackground.path),
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
           ),
 
-          // Main content
+          // Center content with animation
           Center(
             child: AnimatedBuilder(
               animation: _controller,
-              builder: (context, child) {
+              builder: (context, _) {
                 return FadeTransition(
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
@@ -86,112 +83,15 @@ class _SplashScreenState extends State<SplashScreen>
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Globe image with hands
+                        // Logo Text Image
                         Container(
-                          width: 280.w,
-                          height: 280.h,
+                          width: 230,
+                          height: 230,
                           decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.blue.withOpacity(0.3),
-                                blurRadius: 40,
-                                spreadRadius: 10,
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(140.r),
-                            child: Image.asset(
-                              'assets/images/globe_hands.png',
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: RadialGradient(
-                                      colors: [
-                                        Colors.blue.shade700,
-                                        Colors.blue.shade900,
-                                      ],
-                                    ),
-                                  ),
-                                  child: Icon(
-                                    Icons.public,
-                                    size: 120.sp,
-                                    color: Colors.white.withOpacity(0.8),
-                                  ),
-                                );
-                              },
+                            image: DecorationImage(
+                              image: AssetImage(Assets.images.splashScreenLogo.path),
+                              fit: BoxFit.contain,
                             ),
-                          ),
-                        ),
-
-                        SizedBox(height: 40.h),
-
-                        // Logo
-                        Container(
-                          width: 80.w,
-                          height: 80.h,
-                          padding: EdgeInsets.all(12.w),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16.r),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
-                          ),
-                          child: Image.asset(
-                            'assets/images/logo.png',
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Icons.travel_explore,
-                                size: 40.sp,
-                                color: Colors.blue.shade700,
-                              );
-                            },
-                          ),
-                        ),
-
-                        SizedBox(height: 24.h),
-
-                        // Tagline
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: TextStyle(
-                              fontSize: 24.sp,
-                              fontWeight: FontWeight.bold,
-                              height: 1.3,
-                            ),
-                            children: [
-                              TextSpan(
-                                text: "IT'S ",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                              TextSpan(
-                                text: "your",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontStyle: FontStyle.italic,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: Colors.white,
-                                  decorationThickness: 2,
-                                ),
-                              ),
-                              TextSpan(
-                                text: " WORLD, TRAVEL!",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ],

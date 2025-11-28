@@ -1,6 +1,10 @@
 // lib/presentation/screens/settings/settings.dart
 
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:iywt/core/routes/routes.dart';
+import '../../../core/custom_assets/assets.gen.dart';
+import '../../../core/routes/route_path.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -9,126 +13,132 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: const Color(0xFFFDFDFD),
       appBar: AppBar(
         title: const Text(
           'Settings',
           style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: Color(0xFF1D1B20),
+            fontFamily: 'Nunito Sans',
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFFDFDFD),
         elevation: 0,
         centerTitle: true,
       ),
-
       body: Column(
         children: [
           const SizedBox(height: 24),
 
           // ---------------- PROFILE SECTION ----------------
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16),
-            padding: const EdgeInsets.all(16),
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(12),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.shade200,
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+              color: const Color(0xFFF5F5F7),
+              borderRadius: BorderRadius.circular(10),
             ),
             child: Row(
               children: [
-                const CircleAvatar(
-                  radius: 32,
-                  backgroundColor: Colors.blueAccent,
-                  child: Icon(Icons.person, size: 36, color: Colors.white),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(99),
+                  child: Container(
+                    child: Assets.images.profilepicture.image(
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: 10),
                 const Text(
-                  'User Name Placeholder',
+                  'Abdullah Al Junaid',
                   style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF1D1B20),
+                    fontFamily: 'Nunito Sans',
                   ),
                 ),
               ],
             ),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
+
+          // Divider
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            height: 0.5,
+            color: const Color(0xFFC7C7C7),
+          ),
+
+          const SizedBox(height: 18),
 
           // ---------------- OPTIONS ----------------
           _buildSettingOption(
             context: context,
-            icon: Icons.person_outline,
+            icon: Assets.images.myInformation,
             title: 'My Information',
-            onTap: () {
-              print("My Information Clicked");
-            },
+            onTap: () => context.go(RoutePath.myInformation.addBasePath),
           ),
 
           _buildSettingOption(
             context: context,
-            icon: Icons.lock_outline,
+            icon: Assets.images.changePassword,
             title: 'Change Password',
-            onTap: () {
-              print("Change Password Clicked");
-            },
+            onTap: () => context.go(RoutePath.changePassword.addBasePath),
           ),
 
+          const SizedBox(height: 8),
+
+          // Divider
           Container(
-            height: 8,
-            color: Colors.grey.shade100,
+            margin: const EdgeInsets.symmetric(horizontal: 20),
+            height: 0.5,
+            color: const Color(0xFFC7C7C7),
           ),
+
+          const SizedBox(height: 18),
 
           _buildSettingOption(
             context: context,
-            icon: Icons.support_agent,
+            icon: Assets.images.tecnicalSupport,
             title: 'Technical Support',
-            onTap: () {
-              print("Technical Support Clicked");
-            },
+            onTap: () => context.go(RoutePath.technicalSupport.addBasePath),
           ),
 
           _buildSettingOption(
             context: context,
-            icon: Icons.privacy_tip_outlined,
+            icon: Assets.images.privacyPolicy,
             title: 'Privacy Policy',
-            onTap: () {
-              print("Privacy Policy Clicked");
-            },
+            onTap: () => context.go(RoutePath.privacyPolicy.addBasePath),
           ),
 
           const Spacer(),
 
           // ---------------- LOGOUT BUTTON ----------------
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
             child: OutlinedButton(
-              onPressed: () {
-                _showLogoutDialog(context);
-              },
+              onPressed: () => _showLogoutDialog(context),
               style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 50),
-                side: const BorderSide(color: Color(0xFF5B7FBF), width: 2),
+                minimumSize: const Size(double.infinity, 44),
+                side: const BorderSide(color: Color(0xFF375BA4), width: 1),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                 ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               child: const Text(
                 'Logout',
                 style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF5B7FBF),
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF375BA4),
+                  fontFamily: 'Roboto',
                 ),
               ),
             ),
@@ -137,7 +147,6 @@ class SettingsScreen extends StatelessWidget {
           const SizedBox(height: 16),
         ],
       ),
-
       bottomNavigationBar: const CustomNavBar(currentIndex: 4),
     );
   }
@@ -145,32 +154,36 @@ class SettingsScreen extends StatelessWidget {
   // ---------------- OPTION TILE ----------------
   Widget _buildSettingOption({
     required BuildContext context,
-    required IconData icon,
+    required AssetGenImage icon,
     required String title,
     required VoidCallback onTap,
   }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            bottom: BorderSide(color: Colors.grey.shade100),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 13),
+          decoration: BoxDecoration(
+            color: const Color(0xFFF5F5F7),
+            borderRadius: BorderRadius.circular(10),
           ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 24, color: Colors.black87),
-            const SizedBox(width: 16),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.black87,
+          child: Row(
+            children: [
+              icon.image(width: 24, height: 24),
+              const SizedBox(width: 6),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1D1B20),
+                  fontFamily: 'Inter',
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -212,11 +225,11 @@ class SettingsScreen extends StatelessWidget {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop();
+                context.go(RoutePath.login.addBasePath);
                 print("Logout Clicked");
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF5B7FBF),
+                backgroundColor: const Color(0xFF375BA4),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
