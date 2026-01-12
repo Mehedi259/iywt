@@ -25,6 +25,10 @@ class $AssetsImagesGen {
   AssetGenImage get backIcon =>
       const AssetGenImage('assets/images/backIcon.png');
 
+  /// File path: assets/images/birthCertificate.png
+  AssetGenImage get birthCertificate =>
+      const AssetGenImage('assets/images/birthCertificate.png');
+
   /// File path: assets/images/blueMassageBackground.png
   AssetGenImage get blueMassageBackground =>
       const AssetGenImage('assets/images/blueMassageBackground.png');
@@ -38,6 +42,18 @@ class $AssetsImagesGen {
 
   /// File path: assets/images/clip.png
   AssetGenImage get clip => const AssetGenImage('assets/images/clip.png');
+
+  /// File path: assets/images/collegeAcceptance.png
+  AssetGenImage get collegeAcceptance =>
+      const AssetGenImage('assets/images/collegeAcceptance.png');
+
+  /// File path: assets/images/collegeCertificate.png
+  AssetGenImage get collegeCertificate =>
+      const AssetGenImage('assets/images/collegeCertificate.png');
+
+  /// File path: assets/images/collegeTranscript.png
+  AssetGenImage get collegeTranscript =>
+      const AssetGenImage('assets/images/collegeTranscript.png');
 
   /// File path: assets/images/consulateOrOtherVisits.png
   AssetGenImage get consulateOrOtherVisits =>
@@ -94,6 +110,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/greyMassageBackground.png
   AssetGenImage get greyMassageBackground =>
       const AssetGenImage('assets/images/greyMassageBackground.png');
+
+  /// File path: assets/images/healthInsurance.png
+  AssetGenImage get healthInsurance =>
+      const AssetGenImage('assets/images/healthInsurance.png');
 
   /// File path: assets/images/homeActive.png
   AssetGenImage get homeActive =>
@@ -207,6 +227,10 @@ class $AssetsImagesGen {
   /// File path: assets/images/scanner.png
   AssetGenImage get scanner => const AssetGenImage('assets/images/scanner.png');
 
+  /// File path: assets/images/schoolAcceptance.png
+  AssetGenImage get schoolAcceptance =>
+      const AssetGenImage('assets/images/schoolAcceptance.png');
+
   /// File path: assets/images/sendIcon.png
   AssetGenImage get sendIcon =>
       const AssetGenImage('assets/images/sendIcon.png');
@@ -239,10 +263,14 @@ class $AssetsImagesGen {
         abdullahAlJunaid,
         alert,
         backIcon,
+        birthCertificate,
         blueMassageBackground,
         camera,
         changePassword,
         clip,
+        collegeAcceptance,
+        collegeCertificate,
+        collegeTranscript,
         consulateOrOtherVisits,
         correct,
         country,
@@ -258,6 +286,7 @@ class $AssetsImagesGen {
         globeHand,
         greenMassageBackground,
         greyMassageBackground,
+        healthInsurance,
         homeActive,
         homeInactive,
         importantDates,
@@ -287,6 +316,7 @@ class $AssetsImagesGen {
         requirements,
         sampleDocument,
         scanner,
+        schoolAcceptance,
         sendIcon,
         splashScreenBackground,
         splashScreenLogo,

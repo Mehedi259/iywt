@@ -13,12 +13,10 @@ class StudentScreen extends StatelessWidget {
       backgroundColor: Colors.grey.shade50,
       appBar: AppBar(
         leading: IconButton(
-          icon: Container(
-            child: Image(
-              image: Assets.images.backIcon.provider(),
-              height: 44,
-              width: 44
-            ),
+          icon: Image(
+            image: Assets.images.backIcon.provider(),
+            height: 44,
+            width: 44,
           ),
           onPressed: () => context.go(RoutePath.documents.addBasePath),
         ),
@@ -69,6 +67,8 @@ class StudentScreen extends StatelessWidget {
               'Get final certificate as soon as your final grades for the term are posted.',
               isComplete: false,
               icon: Assets.images.alert,
+              onTap: () => context.go(
+                  RoutePath.collegeCertificateScannerScreen.addBasePath),
             ),
             const SizedBox(height: 16),
             _buildDocumentItem(
@@ -77,6 +77,8 @@ class StudentScreen extends StatelessWidget {
               'Get final transcripts as soon as your final grades for the term are posted.',
               isComplete: true,
               icon: Assets.images.correct,
+              onTap: () =>
+                  context.go(RoutePath.collegeTranscriptScannerScreen.addBasePath),
             ),
           ],
         ),
@@ -84,72 +86,75 @@ class StudentScreen extends StatelessWidget {
     );
   }
 
+  /// 🔥 FIXED VERSION – onTap added properly
   Widget _buildDocumentItem({
     required String title,
     required String description,
     required bool isComplete,
     required AssetGenImage icon,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          // TEXT BLOCK
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade400,
-                    height: 1.4,
-                  ),
-                ),
-              ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade200,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // TEXT BLOCK
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade400,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
 
-          const SizedBox(width: 16),
+            const SizedBox(width: 16),
 
-          // STATUS ICON (IMAGE)
-          Image(
-            image: icon.provider(),
-            height: 20,
-            width: 20,
-          ),
+            // STATUS ICON
+            Image(
+              image: icon.provider(),
+              height: 20,
+              width: 20,
+            ),
 
+            const SizedBox(width: 6),
 
-          const SizedBox(width: 6),
-
-          // ------------ ARROW ------------
-          Icon(
-            Icons.chevron_right,
-            size: 26,
-            color: Colors.grey.shade400,
-          )
-        ],
+            Icon(
+              Icons.chevron_right,
+              size: 26,
+              color: Colors.grey.shade400,
+            ),
+          ],
+        ),
       ),
     );
   }

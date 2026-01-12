@@ -28,8 +28,17 @@ class RoutePath {
   static const String student = 'student';
   static const String country = 'country';
   static const String passport = 'passport';
-  static const String scanner = 'scanner';
-  static const String edit = 'edit';
+  static const String passportScanner = 'passportScanner';
+  static const String birthCertificateScannerScreen = 'birthCertificateScannerScreen';
+  static const String birthCertificateScanner = 'birthCertificateScanner';
+  static const String collegeCertificateScannerScreen = 'collegeCertificateScannerScreen';
+  static const String collegeCertificateScanner = 'collegeCertificateScanner';
+  static const String collegeTranscriptScannerScreen = 'collegeTranscriptScannerScreen';
+  static const String collegeTranscriptScanner = 'collegeTranscriptScanner';
+  static const String schoolAcceptanceScannerScreen = 'schoolAcceptanceScannerScreen';
+  static const String schoolAcceptanceScanner = 'schoolAcceptanceScanner';
+  static const String healthInsuranceScannerScreen = 'healthInsuranceScannerScreen';
+  static const String healthInsuranceScanner = 'healthInsuranceScanner';
 
   //==================================== Massage screens =====================================
 

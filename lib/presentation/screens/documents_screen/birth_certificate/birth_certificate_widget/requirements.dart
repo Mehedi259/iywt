@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../../../core/custom_assets/assets.gen.dart';
+
+import '../../../../../core/custom_assets/assets.gen.dart';
+
 
 class RequirementsTab extends StatelessWidget {
   final double horizontalPadding;
@@ -38,10 +40,11 @@ class RequirementsTab extends StatelessWidget {
                     ],
                   ),
                 ),
-                _buildRequirementItem('Valid at least six months beyond your intended return (Jan. 2026).'),
-                _buildRequirementItem('Must be signed by the named holder (or Legal Guardian if under 16) in blue or black ink.'),
-                _buildRequirementItem('Must have at least one blank page in Visa section.'),
-                _buildRequirementItem('Submit one clear color copy of signature/information pages.'),
+                _buildRequirementItem('Birth certificate must be valid and up-to-date for official use.'),
+                _buildRequirementItem('If the holder is under 16, the Legal Guardian must sign or verify the document.'),
+                _buildRequirementItem('The submitted birth certificate copy must be clear and readable.'),
+                _buildRequirementItem('Submit one clean color copy of the birth certificate for verification.'),
+
               ],
             ),
           ),

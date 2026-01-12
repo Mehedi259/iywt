@@ -84,7 +84,7 @@ class PreliminaryScreen extends StatelessWidget {
               title: "Birth Certificate",
               description:
               "You will upload a copy of your birth certificate to verify parental consent.",
-              onPressed: () => context.go(RoutePath.preliminary.addBasePath),
+              onPressed: () => context.go(RoutePath.birthCertificateScannerScreen.addBasePath),
               isComplete: false,
               width: width,
             ),

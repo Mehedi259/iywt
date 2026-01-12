@@ -39,7 +39,6 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
   final ImagePicker _picker = ImagePicker();
 
   late AnimationController _searchAnimationController;
-  late Animation<double> _searchAnimation;
   bool _isSearchVisible = false;
 
   @override
@@ -52,10 +51,6 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
     _searchAnimationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
-    );
-    _searchAnimation = CurvedAnimation(
-      parent: _searchAnimationController,
-      curve: Curves.easeInOut,
     );
   }
 

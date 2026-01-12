@@ -8,11 +8,21 @@ import '../../presentation/screens/authentication/forget_password_otp.dart';
 import '../../presentation/screens/authentication/login.dart';
 import '../../presentation/screens/authentication/reset_password.dart';
 import '../../presentation/screens/authentication/reset_password_success.dart';
+import '../../presentation/screens/documents_screen/birth_certificate/birth_certificate.dart';
+import '../../presentation/screens/documents_screen/birth_certificate/birth_certificate_scanner.dart';
+import '../../presentation/screens/documents_screen/college_certificate/college_certificate.dart';
+import '../../presentation/screens/documents_screen/college_certificate/college_certificate_scanner.dart';
+import '../../presentation/screens/documents_screen/college_transcript/college_transcript.dart';
+import '../../presentation/screens/documents_screen/college_transcript/college_transcript_scanner.dart';
 import '../../presentation/screens/documents_screen/country.dart';
 import '../../presentation/screens/documents_screen/documents.dart';
-import '../../presentation/screens/documents_screen/passport.dart';
+import '../../presentation/screens/documents_screen/health_insurance/health_insurance.dart';
+import '../../presentation/screens/documents_screen/health_insurance/health_insurance_scanner.dart';
+import '../../presentation/screens/documents_screen/passport/passport.dart';
+import '../../presentation/screens/documents_screen/passport/passport_scanner.dart';
 import '../../presentation/screens/documents_screen/preliminary.dart';
-import '../../presentation/screens/documents_screen/scanner.dart';
+import '../../presentation/screens/documents_screen/school_acceptance/school_acceptance.dart';
+import '../../presentation/screens/documents_screen/school_acceptance/school_acceptance_scanner.dart';
 import '../../presentation/screens/documents_screen/student.dart';
 import '../../presentation/screens/home/home.dart';
 import '../../presentation/screens/legal_entry_basic/destination.dart';
@@ -115,14 +125,59 @@ class AppRouter {
         builder: (context, state) => const PassportScreen(),
       ),
       GoRoute(
-        name: RoutePath.scanner,
-        path: RoutePath.scanner.addBasePath,
-        builder: (context, state) => const ScannerScreen(),
+        name: RoutePath.passportScanner,
+        path: RoutePath.passportScanner.addBasePath,
+        builder: (context, state) => const PassportScannerScreen(),
       ),
       GoRoute(
-        name: RoutePath.edit,
-        path: RoutePath.edit.addBasePath,
-        builder: (context, state) => const Placeholder(),
+        name: RoutePath.birthCertificateScannerScreen,
+        path: RoutePath.birthCertificateScannerScreen.addBasePath,
+        builder: (context, state) => const BirthCertificateScannerScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.birthCertificateScanner,
+        path: RoutePath.birthCertificateScanner.addBasePath,
+        builder: (context, state) => const BirthCertificateScanner(),
+      ),
+      GoRoute(
+        name: RoutePath.collegeCertificateScannerScreen,
+        path: RoutePath.collegeCertificateScannerScreen.addBasePath,
+        builder: (context, state) => const CollegeCertificateScannerScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.collegeCertificateScanner,
+        path: RoutePath.collegeCertificateScanner.addBasePath,
+        builder: (context, state) => const CollegeCertificateScanner(),
+      ),
+      GoRoute(
+        name: RoutePath.collegeTranscriptScannerScreen,
+        path: RoutePath.collegeTranscriptScannerScreen.addBasePath,
+        builder: (context, state) => const CollegeTranscriptScannerScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.collegeTranscriptScanner,
+        path: RoutePath.collegeTranscriptScanner.addBasePath,
+        builder: (context, state) => const CollegeTranscriptScanner(),
+      ),
+      GoRoute(
+        name: RoutePath.schoolAcceptanceScannerScreen,
+        path: RoutePath.schoolAcceptanceScannerScreen.addBasePath,
+        builder: (context, state) => const SchoolAcceptanceScannerScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.schoolAcceptanceScanner,
+        path: RoutePath.schoolAcceptanceScanner.addBasePath,
+        builder: (context, state) => const SchoolAcceptanceScanner(),
+      ),
+      GoRoute(
+        name: RoutePath.healthInsuranceScannerScreen,
+        path: RoutePath.healthInsuranceScannerScreen.addBasePath,
+        builder: (context, state) => const HealthInsuranceScannerScreen(),
+      ),
+      GoRoute(
+        name: RoutePath.healthInsuranceScanner,
+        path: RoutePath.healthInsuranceScanner.addBasePath,
+        builder: (context, state) => const HealthInsuranceScanner(),
       ),
 
       // ================== Massage ==================

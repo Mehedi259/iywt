@@ -4,24 +4,25 @@ import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iywt/core/routes/routes.dart';
 import 'package:share_plus/share_plus.dart';
-import '../../../core/custom_assets/assets.gen.dart';
-import '../../../core/routes/route_path.dart';
 
-class ScannerScreen extends StatefulWidget {
+import '../../../../core/custom_assets/assets.gen.dart';
+import '../../../../core/routes/route_path.dart';
+
+class HealthInsuranceScanner extends StatefulWidget {
   final String documentTitle;
   final String documentDescription;
 
-  const ScannerScreen({
+  const HealthInsuranceScanner({
     super.key,
-    this.documentTitle = 'College Certificate',
-    this.documentDescription = 'Get final certificate as soon as your final grades for the...',
+    this.documentTitle = 'School Acceptance Letters',
+    this.documentDescription = 'Get final School Acceptance Letters as soon as your final grades for the...',
   });
 
   @override
-  State<ScannerScreen> createState() => _ScannerScreenState();
+  State<HealthInsuranceScanner> createState() => _HealthInsuranceScannerState();
 }
 
-class _ScannerScreenState extends State<ScannerScreen> {
+class _HealthInsuranceScannerState extends State<HealthInsuranceScanner> {
   List<String> _scannedPages = [];
   bool _isScanning = false;
   bool _hasNavigatedBack = false;

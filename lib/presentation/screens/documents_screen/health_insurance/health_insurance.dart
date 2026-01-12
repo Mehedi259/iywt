@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iywt/core/routes/routes.dart';
-import '../../../core/custom_assets/assets.gen.dart';
-import '../../../core/routes/route_path.dart';
-import '../../widgets/custom_navigation/custom_navbar.dart';
-import 'passport_widgets/details.dart';
-import 'passport_widgets/requirements.dart';
-import 'passport_widgets/status.dart';
-import 'passport_widgets/uploads.dart';
 
-class PassportScreen extends StatefulWidget {
-  const PassportScreen({super.key});
+import '../../../../core/custom_assets/assets.gen.dart';
+import '../../../../core/routes/route_path.dart';
+import '../../../widgets/custom_navigation/custom_navbar.dart';
+import '../health_insurance/health_insurance_widget/details.dart';
+import '../health_insurance/health_insurance_widget/requirements.dart';
+import '../health_insurance/health_insurance_widget/status.dart';
+import '../health_insurance/health_insurance_widget/uploads.dart';
+
+
+class HealthInsuranceScannerScreen extends StatefulWidget {
+  const HealthInsuranceScannerScreen({super.key});
 
   @override
-  State<PassportScreen> createState() => _PassportScreenState();
+  State<HealthInsuranceScannerScreen> createState() => _HealthInsuranceScannerScreenState();
 }
 
-class _PassportScreenState extends State<PassportScreen> {
+class _HealthInsuranceScannerScreenState extends State<HealthInsuranceScannerScreen> {
   int _selectedTabIndex = 0;
 
   @override
@@ -31,7 +33,7 @@ class _PassportScreenState extends State<PassportScreen> {
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: GestureDetector(
-            onTap: () => context.go(RoutePath.preliminary.addBasePath),
+            onTap: () => context.go(RoutePath.country.addBasePath),
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFE8F3FF),
@@ -50,7 +52,7 @@ class _PassportScreenState extends State<PassportScreen> {
           ),
         ),
         title: const Text(
-          'Passport',
+          'Health Insurance Documents',
           style: TextStyle(
             fontSize: 18,
             fontFamily: 'Nunito Sans',
@@ -131,7 +133,7 @@ class _PassportScreenState extends State<PassportScreen> {
   Widget _buildTabContent(double hPadding) {
     switch (_selectedTabIndex) {
       case 0:
-        return DetailsTab(horizontalPadding: hPadding);
+        return  DetailsTab(horizontalPadding: hPadding);
       case 1:
         return RequirementsTab(horizontalPadding: hPadding);
       case 2:
@@ -170,7 +172,7 @@ class _PassportScreenState extends State<PassportScreen> {
               width: 28,
             ),
             onPressed: () =>
-                context.go(RoutePath.scanner.addBasePath),
+                context.go(RoutePath.healthInsuranceScanner.addBasePath),
           ),
         ],
       ),

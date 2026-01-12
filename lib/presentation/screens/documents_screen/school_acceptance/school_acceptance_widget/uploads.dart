@@ -45,7 +45,7 @@ class UploadsTab extends StatelessWidget {
                             Text('aaron@jivt.com', style: TextStyle(fontSize: 16, color: Color(0xFF1D1B20))),
                             SizedBox(height: 8),
                             Text('Description', style: TextStyle(fontSize: 8, color: Color(0xFFC7C7C7))),
-                            Text('Anello-Dennee Passport', style: TextStyle(fontSize: 12, color: Color(0xFF1D1B20))),
+                            Text('Anello-Dennee School Acceptance Letters', style: TextStyle(fontSize: 12, color: Color(0xFF1D1B20))),
                           ],
                         ),
                       ),

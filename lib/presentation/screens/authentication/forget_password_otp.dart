@@ -21,7 +21,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   int _secondsRemaining = 60;
   Timer? _timer;
   bool _canResend = false;
-  String _currentOtp = '';
 
   @override
   void initState() {
@@ -66,7 +65,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
     return '${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
   }
 
-  bool get _isOtpComplete => _currentOtp.length == 4;
 
   @override
   void dispose() {
@@ -172,7 +170,6 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     ),
                     onChanged: (value) {
                       setState(() {
-                        _currentOtp = value;
                       });
                     },
                     onCompleted: (value) {

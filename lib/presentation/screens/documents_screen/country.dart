@@ -11,7 +11,6 @@ class CountryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-
       appBar: AppBar(
         leading: IconButton(
           icon: Image(
@@ -21,7 +20,6 @@ class CountryScreen extends StatelessWidget {
           ),
           onPressed: () => context.go(RoutePath.documents.addBasePath),
         ),
-
         title: const Text(
           'Country',
           style: TextStyle(
@@ -30,10 +28,8 @@ class CountryScreen extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-
         backgroundColor: Colors.white,
         elevation: 0,
-
         actions: [
           Container(
             margin: const EdgeInsets.only(right: 16),
@@ -58,7 +54,6 @@ class CountryScreen extends StatelessWidget {
           ),
         ],
       ),
-
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -69,16 +64,20 @@ class CountryScreen extends StatelessWidget {
               'Get final transcripts as soon as your final grades for the term are posted.',
               isComplete: false,
               icon: Assets.images.alert,
+              onTap: () => context.go(
+                RoutePath.schoolAcceptanceScannerScreen.addBasePath,
+              ),
             ),
-
             const SizedBox(height: 16),
-
             _buildDocumentItem(
               title: 'Proof of Health insurance',
               description:
               'Get final transcripts as soon as your final grades for the term are posted.',
               isComplete: true,
               icon: Assets.images.correct,
+              onTap: () => context.go(
+                RoutePath.healthInsuranceScannerScreen.addBasePath,
+              ),
             ),
           ],
         ),
@@ -91,70 +90,66 @@ class CountryScreen extends StatelessWidget {
     required String description,
     required bool isComplete,
     required AssetGenImage icon,
+    required VoidCallback onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.shade200,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-
-      child: Row(
-        children: [
-          // TEXT SECTION
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.black,
-                  ),
-                ),
-
-                const SizedBox(height: 8),
-
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey.shade400,
-                    height: 1.4,
-                  ),
-                ),
-              ],
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.shade200,
+              blurRadius: 8,
+              offset: const Offset(0, 2),
             ),
-          ),
-
-          const SizedBox(width: 16),
-
-          // STATUS ICON
-          Image(
-            image: icon.provider(),
-            height: 20,
-            width: 20,
-          ),
-
-          const SizedBox(width: 6),
-
-          // ------------ ARROW ------------
-          Icon(
-            Icons.chevron_right,
-            size: 26,
-            color: Colors.grey.shade400,
-          )
-        ],
+          ],
+        ),
+        child: Row(
+          children: [
+            // TEXT SECTION
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    description,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.grey.shade400,
+                      height: 1.4,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 16),
+            // STATUS ICON
+            Image(
+              image: icon.provider(),
+              height: 20,
+              width: 20,
+            ),
+            const SizedBox(width: 6),
+            // ARROW ICON
+            Icon(
+              Icons.chevron_right,
+              size: 26,
+              color: Colors.grey.shade400,
+            ),
+          ],
+        ),
       ),
     );
   }

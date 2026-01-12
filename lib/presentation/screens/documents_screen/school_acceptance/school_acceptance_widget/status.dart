@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../../core/custom_assets/assets.gen.dart';
+
+import '../../../../../core/custom_assets/assets.gen.dart';
 
 class StatusTab extends StatelessWidget {
   final double horizontalPadding;
@@ -235,7 +236,7 @@ class StatusTab extends StatelessWidget {
                           ),
                           SizedBox(height: 6),
                           Text(
-                            'Passport is not signed',
+                            'School Acceptance Letters is not signed',
                             style: TextStyle(
                               color: Color(0xFF1D1B20),
                               fontSize: 14,
@@ -275,7 +276,7 @@ class StatusTab extends StatelessWidget {
                           ),
                           SizedBox(height: 6),
                           Text(
-                            'Sign your passport and upload a new copy',
+                            'Sign your School Acceptance Letters and upload a new copy',
                             style: TextStyle(
                               color: Color(0xFF1D1B20),
                               fontSize: 14,
