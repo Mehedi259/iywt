@@ -15,5 +15,21 @@ class ApiConstants {
   // Legal Entry Endpoints
   static const String legalEntryBasics = "/LongTermStudent/LegalEntryBasics";
 
-// Add other endpoints as needed
+  // Student Information Endpoints
+  static const String studentInformation = "/LongTermStudent/StudentInformation";
+
+  // Student Addresses Endpoints
+  static const String studentAddresses = "/LongTermStudent/StudentAddresses";
+  static String studentAddressById(String id) => "/LongTermStudent/StudentAddresses/$id";
+
+  // Student Emails Endpoints
+  static const String studentEmails = "/LongTermStudent/StudentEmails";
+  static String studentEmailById(String id) => "/LongTermStudent/StudentEmails/$id";
+
+  // Student Phones Endpoints
+  static const String studentPhones = "/LongTermStudent/StudentPhones";
+  static String studentPhoneById(String id) => "/LongTermStudent/StudentPhones/$id";
+
+  // Technical Support Endpoint
+  static const String technicalSupport = "/General/TechnicalSupport";
 }

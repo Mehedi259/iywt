@@ -1,80 +1,61 @@
-
-// ============================================
 // lib/presentation/screens/settings/add_address.dart
-// ============================================
 
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 import '../../../core/custom_assets/assets.gen.dart';
+import '../../../global/controler/settings/address_controler.dart';
 
-class AddAddressScreen extends StatefulWidget {
+class AddAddressScreen extends StatelessWidget {
   const AddAddressScreen({super.key});
 
   @override
-  State<AddAddressScreen> createState() => _AddAddressScreenState();
-}
-
-class _AddAddressScreenState extends State<AddAddressScreen> {
-  final TextEditingController _addressController = TextEditingController(text: '123 Main St');
-  final TextEditingController _cityController = TextEditingController(text: 'Town');
-  final TextEditingController _stateController = TextEditingController(text: 'OR');
-  final TextEditingController _zipController = TextEditingController(text: '12345');
-
-  String _selectedType = 'Residence';
-  String _selectedCountry = 'USA';
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.find<AddressController>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Container(
-          child: IconButton(
-            icon: Assets.images.backIcon.image(width: 44, height: 44),
-            onPressed: () => Navigator.pop(context),
-          ),
+        leading: IconButton(
+          icon: Assets.images.backIcon.image(width: 44, height: 44),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Address',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black),
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView(
+      body: Obx(() => SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             _buildDropdownField(
               label: 'Type',
-              value: _selectedType,
-              items: ['Residence', 'Mailing'],
-              onChanged: (value) => setState(() => _selectedType = value!),
+              value: controller.selectedType.value,
+              items: const ['Residence', 'Mailing'],
+              onChanged: (value) => controller.selectedType.value = value!,
             ),
             const SizedBox(height: 20),
 
-            _buildTextField(label: 'Address', controller: _addressController),
+            _buildTextField(label: 'Address', controller: controller.addressController),
             const SizedBox(height: 20),
 
-            _buildTextField(label: 'City', controller: _cityController),
+            _buildTextField(label: 'City', controller: controller.cityController),
             const SizedBox(height: 20),
 
-            _buildTextField(label: 'State / Province', controller: _stateController),
+            _buildTextField(label: 'State / Province', controller: controller.stateController),
             const SizedBox(height: 20),
 
-            _buildTextField(label: 'Zip / Postal Code', controller: _zipController),
+            _buildTextField(label: 'Zip / Postal Code', controller: controller.zipController),
             const SizedBox(height: 20),
 
             _buildDropdownField(
               label: 'Country',
-              value: _selectedCountry,
-              items: ['USA', 'Canada', 'UK', 'Other'],
-              onChanged: (value) => setState(() => _selectedCountry = value!),
+              value: controller.selectedCountry.value,
+              items: const ['USA', 'Canada', 'UK', 'Other'],
+              onChanged: (value) => controller.selectedCountry.value = value!,
             ),
             const SizedBox(height: 40),
 
@@ -82,34 +63,29 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
-                  print('Save clicked');
-                  Navigator.pop(context);
-                },
+                onPressed: controller.isLoading.value ? null : controller.saveAddress,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF5B7FBF),
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text(
-                  'Save',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
+                child: controller.isLoading.value
+                    ? const SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
+                    : const Text('Save', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
-  Widget _buildTextField({
-    required String label,
-    required TextEditingController controller,
-  }) {
+  Widget _buildTextField({required String label, required TextEditingController controller}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -118,15 +94,9 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         TextField(
           controller: controller,
           decoration: InputDecoration(
-            border: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF5B7FBF)),
-            ),
+            border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF5B7FBF))),
           ),
         ),
       ],
@@ -147,31 +117,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
         DropdownButtonFormField<String>(
           value: value,
           decoration: InputDecoration(
-            border: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF5B7FBF)),
-            ),
+            border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF5B7FBF))),
           ),
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(value: item, child: Text(item));
-          }).toList(),
+          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
           onChanged: onChanged,
         ),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    _addressController.dispose();
-    _cityController.dispose();
-    _stateController.dispose();
-    _zipController.dispose();
-    super.dispose();
   }
 }

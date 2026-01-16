@@ -1,10 +1,13 @@
 // lib/presentation/screens/settings/settings.dart
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iywt/core/routes/routes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/custom_assets/assets.gen.dart';
 import '../../../core/routes/route_path.dart';
+import '../../../global/controler/settings/student_information_controler.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -12,6 +15,8 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final studentController = Get.put(StudentInformationController());
+
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
       appBar: AppBar(
@@ -28,11 +33,11 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
       ),
-      body: Column(
+      body: Obx(() => Column(
         children: [
           const SizedBox(height: 24),
 
-          // ---------------- PROFILE SECTION ----------------
+          // Profile Section
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
@@ -44,18 +49,24 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(99),
-                  child: Container(
-                    child: Assets.images.profilepicture.image(
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                    ),
+                  child: studentController.profilePhotoUrl.value.isEmpty
+                      ? Assets.images.profilepicture.image(width: 60, height: 60, fit: BoxFit.cover)
+                      : CachedNetworkImage(
+                    imageUrl: studentController.profilePhotoUrl.value,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        Assets.images.profilepicture.image(width: 60, height: 60, fit: BoxFit.cover),
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  'Abdullah Al Junaid',
-                  style: TextStyle(
+                Text(
+                  studentController.preferredNameController.text.isEmpty
+                      ? 'Student Name'
+                      : studentController.preferredNameController.text,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF1D1B20),
@@ -68,7 +79,6 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-          // Divider
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             height: 0.5,
@@ -77,7 +87,6 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 18),
 
-          // ---------------- OPTIONS ----------------
           _buildSettingOption(
             context: context,
             icon: Assets.images.myInformation,
@@ -94,7 +103,6 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-          // Divider
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             height: 0.5,
@@ -119,7 +127,6 @@ class SettingsScreen extends StatelessWidget {
 
           const Spacer(),
 
-          // ---------------- LOGOUT BUTTON ----------------
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: OutlinedButton(
@@ -127,9 +134,7 @@ class SettingsScreen extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 44),
                 side: const BorderSide(color: Color(0xFF375BA4), width: 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               child: const Text(
@@ -146,12 +151,11 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
         ],
-      ),
+      )),
       bottomNavigationBar: const CustomNavBar(currentIndex: 4),
     );
   }
 
-  // ---------------- OPTION TILE ----------------
   Widget _buildSettingOption({
     required BuildContext context,
     required AssetGenImage icon,
@@ -189,39 +193,21 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- LOGOUT DIALOG ----------------
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          title: const Text(
-            'Logout',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Logout', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
           content: Text(
             'Are you sure you want to logout?',
-            style: TextStyle(
-              fontSize: 14,
-              color: Colors.grey.shade700,
-            ),
+            style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(
-                'Cancel',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                ),
-              ),
+              child: Text('Cancel', style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -230,17 +216,9 @@ class SettingsScreen extends StatelessWidget {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF375BA4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
               ),
-              child: const Text(
-                'Logout',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.white,
-                ),
-              ),
+              child: const Text('Logout', style: TextStyle(fontSize: 14, color: Colors.white)),
             ),
           ],
         );
