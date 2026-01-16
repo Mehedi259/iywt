@@ -12,5 +12,8 @@ class ApiConstants {
   // Home/Dashboard Endpoints
   static const String dashboard = "/LongTermStudent/Dashboard";
 
+  // Legal Entry Endpoints
+  static const String legalEntryBasics = "/LongTermStudent/LegalEntryBasics";
+
 // Add other endpoints as needed
 }
