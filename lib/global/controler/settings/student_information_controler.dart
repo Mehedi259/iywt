@@ -1,4 +1,4 @@
-// lib/global/controller/settings/student_information_controller.dart
+// lib/global/controler/settings/student_information_controler.dart
 
 import 'dart:io';
 import 'package:flutter/foundation.dart';
@@ -72,6 +72,44 @@ class StudentInformationController extends GetxController {
     }
   }
 
+  /// Select Date of Birth
+  Future<void> selectDateOfBirth(BuildContext context) async {
+    // Parse current date if exists
+    DateTime initialDate = DateTime(2000);
+    if (dobController.text.isNotEmpty) {
+      try {
+        initialDate = DateTime.parse(dobController.text);
+      } catch (e) {
+        // If parsing fails, use default
+        initialDate = DateTime(2000);
+      }
+    }
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(1950),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Color(0xFF5B7FBF),
+              onPrimary: Colors.white,
+              onSurface: Colors.black,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      // Format: YYYY-MM-DD
+      dobController.text = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+    }
+  }
+
   // Update student information
   Future<void> updateProfile() async {
     try {
@@ -79,7 +117,7 @@ class StudentInformationController extends GetxController {
 
       final fields = {
         'preferredName': preferredNameController.text,
-        'dateOfBirth': dobController.text.split(' ').reversed.join('-'),
+        'dateOfBirth': dobController.text,
         'gender': selectedGender.value,
         'parentLegalGuardianOneName': guardian1Controller.text,
         'parentLegalGuardianTwoName': guardian2Controller.text,
@@ -93,14 +131,31 @@ class StudentInformationController extends GetxController {
       );
 
       if (success) {
-        Get.snackbar('Success', 'Profile updated successfully',
-            snackPosition: SnackPosition.BOTTOM);
+        Get.snackbar(
+          'Success',
+          'Profile updated successfully',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.green,
+          colorText: Colors.white,
+        );
         await loadStudentInformation();
       } else {
-        Get.snackbar('Error', 'Failed to update profile');
+        Get.snackbar(
+          'Error',
+          'Failed to update profile',
+          snackPosition: SnackPosition.BOTTOM,
+          backgroundColor: Colors.red,
+          colorText: Colors.white,
+        );
       }
     } catch (e) {
-      Get.snackbar('Error', 'An error occurred');
+      Get.snackbar(
+        'Error',
+        'An error occurred',
+        snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Colors.red,
+        colorText: Colors.white,
+      );
     } finally {
       isLoading.value = false;
     }

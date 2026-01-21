@@ -1,11 +1,11 @@
 // lib/presentation/screens/settings/student_information.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/custom_assets/assets.gen.dart';
 import '../../../global/controler/settings/student_information_controler.dart';
-
 
 class StudentInformationScreen extends StatelessWidget {
   const StudentInformationScreen({super.key});
@@ -77,7 +77,11 @@ class StudentInformationScreen extends StatelessWidget {
               ),
               const SizedBox(height: 30),
 
-              _buildTextField(label: 'Preferred Name', controller: controller.preferredNameController),
+              _buildTextField(
+                label: 'Preferred Name',
+                controller: controller.preferredNameController,
+                maxLength: 18,
+              ),
               const SizedBox(height: 20),
 
               _buildTextField(
@@ -85,6 +89,7 @@ class StudentInformationScreen extends StatelessWidget {
                 controller: controller.dobController,
                 suffixIcon: Assets.images.dateOfBirthIcon,
                 readOnly: true,
+                onTap: () => controller.selectDateOfBirth(context),
               ),
               const SizedBox(height: 20),
 
@@ -96,10 +101,16 @@ class StudentInformationScreen extends StatelessWidget {
               ),
               const SizedBox(height: 20),
 
-              _buildTextField(label: 'Parent / Legal Guardian 1', controller: controller.guardian1Controller),
+              _buildTextField(
+                label: 'Parent / Legal Guardian 1',
+                controller: controller.guardian1Controller,
+              ),
               const SizedBox(height: 20),
 
-              _buildTextField(label: 'Parent / Legal Guardian 2', controller: controller.guardian2Controller),
+              _buildTextField(
+                label: 'Parent / Legal Guardian 2',
+                controller: controller.guardian2Controller,
+              ),
               const SizedBox(height: 20),
 
               _buildDropdownField(
@@ -135,6 +146,8 @@ class StudentInformationScreen extends StatelessWidget {
     required TextEditingController controller,
     AssetGenImage? suffixIcon,
     bool readOnly = false,
+    int? maxLength,
+    VoidCallback? onTap,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -144,7 +157,15 @@ class StudentInformationScreen extends StatelessWidget {
         TextField(
           controller: controller,
           readOnly: readOnly,
+          maxLength: maxLength,
+          onTap: onTap,
+          inputFormatters: maxLength != null
+              ? [
+            LengthLimitingTextInputFormatter(maxLength),
+          ]
+              : null,
           decoration: InputDecoration(
+            counterText: '', // Hide the counter text below the field
             suffixIcon: suffixIcon != null
                 ? Padding(padding: const EdgeInsets.all(12.0), child: suffixIcon.image(width: 20, height: 20))
                 : null,

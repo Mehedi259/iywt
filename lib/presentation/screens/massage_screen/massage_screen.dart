@@ -22,7 +22,7 @@ class Message {
   });
 }
 
-enum MessageType { user, coach, other }
+enum MessageType { user, coach }
 
 class MessageScreen extends StatefulWidget {
   const MessageScreen({super.key});
@@ -72,12 +72,6 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
         message: "I'm not sure which documents are still pending. Could you guide me?",
         time: '05 SEP 2025 @ 13:02 PDT',
         type: MessageType.user,
-      ),
-      Message(
-        message: "Hi, I've checked your documents. Your passport has been successfully submitted.",
-        time: '05 SEP 2025 @ 13:05 PDT',
-        type: MessageType.other,
-        sender: 'John Doe - Rotary',
       ),
     ]);
   }
@@ -347,16 +341,6 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
                         sender: message.sender ?? 'Coach',
                       ),
                     );
-                  case MessageType.other:
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildOtherMessage(
-                        width: width,
-                        message: message.message,
-                        time: message.time,
-                        sender: message.sender ?? 'Other',
-                      ),
-                    );
                 }
               },
             ),
@@ -499,58 +483,6 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
       ],
     );
   }
-
-  // ---------------------------------------------------------
-  // OTHER MESSAGE (GREEN)
-  // ---------------------------------------------------------
-  Widget _buildOtherMessage({
-    required double width,
-    required String message,
-    required String time,
-    required String sender,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          constraints: BoxConstraints(maxWidth: width * 0.75),
-          padding: const EdgeInsets.all(14),
-          decoration: BoxDecoration(
-            color: Colors.green.shade400,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-              bottomLeft: Radius.circular(6),
-            ),
-          ),
-          child: Text(
-            message,
-            style: const TextStyle(
-              fontSize: 14,
-              color: Colors.white,
-              height: 1.4,
-            ),
-          ),
-        ),
-        const SizedBox(height: 4),
-        Row(
-          children: [
-            Text(
-              sender,
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              time,
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
   // ---------------------------------------------------------
   // MESSAGE INPUT BOX
   // ---------------------------------------------------------

@@ -93,13 +93,7 @@ class SettingsScreen extends StatelessWidget {
             title: 'My Information',
             onTap: () => context.go(RoutePath.myInformation.addBasePath),
           ),
-
-          _buildSettingOption(
-            context: context,
-            icon: Assets.images.changePassword,
-            title: 'Change Password',
-            onTap: () => context.go(RoutePath.changePassword.addBasePath),
-          ),
+          
 
           const SizedBox(height: 8),
 
