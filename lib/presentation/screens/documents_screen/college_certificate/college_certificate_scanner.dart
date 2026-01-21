@@ -1,12 +1,19 @@
+// lib/features/screens/documents/college_certificate/college_certificate_scanner.dart
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cunning_document_scanner/cunning_document_scanner.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:iywt/core/routes/routes.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
 
 import '../../../../core/custom_assets/assets.gen.dart';
 import '../../../../core/routes/route_path.dart';
+import '../../../../global/controler/documents/documents_controler.dart';
 
 class CollegeCertificateScanner extends StatefulWidget {
   final String documentTitle;
@@ -15,14 +22,17 @@ class CollegeCertificateScanner extends StatefulWidget {
   const CollegeCertificateScanner({
     super.key,
     this.documentTitle = 'College Certificate',
-    this.documentDescription = 'Get final certificate as soon as your final grades for the...',
+    this.documentDescription =
+    'Get final certificate as soon as your final grades for the...',
   });
 
   @override
-  State<CollegeCertificateScanner> createState() => _CollegeCertificateScannerState();
+  State<CollegeCertificateScanner> createState() =>
+      _CollegeCertificateScannerState();
 }
 
 class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
+  final DocumentsController _controller = Get.find<DocumentsController>();
   List<String> _scannedPages = [];
   bool _isScanning = false;
   bool _hasNavigatedBack = false;
@@ -54,7 +64,7 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          context.go(RoutePath.passport.addBasePath);
+          context.go(RoutePath.collegeCertificateScannerScreen.addBasePath);
         }
       });
     }
@@ -72,14 +82,16 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
         pictures = await CunningDocumentScanner.getPictures(
           noOfPages: 10,
           isGalleryImportAllowed: true,
-        ) ?? [];
+        ) ??
+            [];
       } else if (Platform.isIOS) {
         pictures = await CunningDocumentScanner.getPictures(
           iosScannerOptions: IosScannerOptions(
             imageFormat: IosImageFormat.jpg,
             jpgCompressionQuality: 0.9,
           ),
-        ) ?? [];
+        ) ??
+            [];
       } else {
         pictures = await CunningDocumentScanner.getPictures() ?? [];
       }
@@ -150,9 +162,7 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 16),
-
                 const Text(
                   'Title',
                   style: TextStyle(color: Colors.white, fontSize: 16),
@@ -163,9 +173,7 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
                   style: const TextStyle(color: Colors.black),
                   decoration: _inputDecoration(),
                 ),
-
                 const SizedBox(height: 16),
-
                 const Text(
                   'Short Description of File',
                   style: TextStyle(color: Colors.white, fontSize: 16),
@@ -177,9 +185,7 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
                   style: const TextStyle(color: Colors.black),
                   decoration: _inputDecoration(),
                 ),
-
                 const SizedBox(height: 24),
-
                 Row(
                   children: [
                     Expanded(
@@ -206,9 +212,9 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
                     const SizedBox(width: 16),
                     Expanded(
                       child: _buildBottomButton(
-                        icon: Icons.save,
-                        label: 'Save',
-                        onTap: _saveDocument,
+                        icon: Icons.upload_file,
+                        label: 'Upload as PDF',
+                        onTap: _uploadAsPDF,
                       ),
                     ),
                   ],
@@ -251,7 +257,8 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
             child: Icon(icon, color: Colors.white, size: 28),
           ),
           const SizedBox(height: 8),
-          Text(label, style: const TextStyle(color: Colors.white, fontSize: 12)),
+          Text(label,
+              style: const TextStyle(color: Colors.white, fontSize: 12)),
         ],
       ),
     );
@@ -267,14 +274,16 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
         newPictures = await CunningDocumentScanner.getPictures(
           noOfPages: 10,
           isGalleryImportAllowed: true,
-        ) ?? [];
+        ) ??
+            [];
       } else if (Platform.isIOS) {
         newPictures = await CunningDocumentScanner.getPictures(
           iosScannerOptions: IosScannerOptions(
             imageFormat: IosImageFormat.jpg,
             jpgCompressionQuality: 0.9,
           ),
-        ) ?? [];
+        ) ??
+            [];
       }
 
       if (!mounted) return;
@@ -316,13 +325,13 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
                       const Expanded(
                         child: Text('Preview',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.white, fontSize: 18)),
+                            style:
+                            TextStyle(color: Colors.white, fontSize: 18)),
                       ),
                       const SizedBox(width: 48)
                     ],
                   ),
                 ),
-
                 SizedBox(
                   height: 500,
                   child: PageView.builder(
@@ -383,31 +392,103 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
     );
   }
 
-  Future<void> _saveDocument() async {
+  Future<void> _uploadAsPDF() async {
     if (_scannedPages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No pages to save')),
+        const SnackBar(content: Text('No pages to upload')),
       );
       return;
     }
 
-    Navigator.pop(context);
+    Navigator.pop(context); // Close bottom sheet
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Saved ${_scannedPages.length} page(s) successfully!'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    try {
+      // Show loading
+      Get.dialog(
+        const Center(
+          child: Card(
+            child: Padding(
+              padding: EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Creating PDF...'),
+                ],
+              ),
+            ),
+          ),
+        ),
+        barrierDismissible: false,
+      );
 
-    await Future.delayed(const Duration(milliseconds: 400));
+      // Create PDF
+      final pdf = pw.Document();
 
-    context.pop({
-      'title': _titleController.text,
-      'description': _descriptionController.text,
-      'pageCount': _scannedPages.length,
-      'images': _scannedPages,
-    });
+      for (final imagePath in _scannedPages) {
+        final imageFile = File(imagePath);
+        final imageBytes = await imageFile.readAsBytes();
+        final image = pw.MemoryImage(imageBytes);
+
+        pdf.addPage(
+          pw.Page(
+            pageFormat: PdfPageFormat.a4,
+            build: (pw.Context context) {
+              return pw.Center(
+                child: pw.Image(image, fit: pw.BoxFit.contain),
+              );
+            },
+          ),
+        );
+      }
+
+      // Save PDF to temp directory
+      final output = await getTemporaryDirectory();
+      final file = File(
+          '${output.path}/${_titleController.text.replaceAll(' ', '_')}_${DateTime.now().millisecondsSinceEpoch}.pdf');
+      await file.writeAsBytes(await pdf.save());
+
+      Get.back(); // Close loading dialog
+
+      // Upload the PDF
+      final documentId = _controller.currentDocumentId.value;
+      if (documentId.isEmpty) {
+        Get.snackbar(
+          'Error',
+          'No document selected',
+          snackPosition: SnackPosition.BOTTOM,
+        );
+        return;
+      }
+
+      final success = await _controller.uploadDocument(
+        documentId: documentId,
+        description: _descriptionController.text,
+        documentFile: file,
+      );
+
+      if (success && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'Uploaded ${_scannedPages.length} page(s) as PDF successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+
+        await Future.delayed(const Duration(milliseconds: 400));
+        _navigateBack();
+      }
+    } catch (e) {
+      Get.back(); // Close loading dialog if open
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error creating PDF: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   Future<void> _shareDocument() async {
@@ -429,18 +510,16 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         leading: IconButton(
-          icon: Container(
-            child: Image.asset(
-              Assets.images.backIcon.path,
-              width: 157,
-              height: 118,
-              fit: BoxFit.cover,
-            ),
+          icon: Image.asset(
+            Assets.images.backIcon.path,
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
           ),
-          onPressed: () => context.go(RoutePath.passport.addBasePath),
+          onPressed: () =>
+              context.go(RoutePath.collegeCertificateScannerScreen.addBasePath),
         ),
         title: const Text(
           'Scanner',
@@ -451,58 +530,57 @@ class _CollegeCertificateScannerState extends State<CollegeCertificateScanner> {
         elevation: 0,
         backgroundColor: Colors.white,
       ),
-
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 50),
-            child: _isScanning
-                ? Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const CircularProgressIndicator(color: Color(0xFF5B7FBF)),
-                const SizedBox(height: 20),
-                Text(
-                  'Opening Scanner...',
-                  style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 50),
+          child: _isScanning
+              ? Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(
+                  color: Color(0xFF5B7FBF)),
+              const SizedBox(height: 20),
+              Text(
+                'Opening Scanner...',
+                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+              ),
+            ],
+          )
+              : Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.document_scanner,
+                size: 80,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 20),
+              Text(
+                'Scanner Ready',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.grey[700],
                 ),
-              ],
-            )
-                : Column(
-              children: [
-                Icon(
-                  Icons.document_scanner,
-                  size: 80,
-                  color: Colors.grey[400],
+              ),
+              const SizedBox(height: 10),
+              Text(
+                'Position your document and tap scan',
+                style: TextStyle(fontSize: 14, color: Colors.grey[500]),
+              ),
+              const SizedBox(height: 32),
+              ElevatedButton.icon(
+                onPressed: _startScanning,
+                icon: const Icon(Icons.camera_alt),
+                label: const Text('Start Scanning'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF5B7FBF),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 32, vertical: 16),
                 ),
-                const SizedBox(height: 20),
-                Text(
-                  'Scanner Ready',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  'Position your document and tap scan',
-                  style: TextStyle(fontSize: 14, color: Colors.grey[500]),
-                ),
-                const SizedBox(height: 32),
-                ElevatedButton.icon(
-                  onPressed: _startScanning,
-                  icon: const Icon(Icons.camera_alt),
-                  label: const Text('Start Scanning'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF5B7FBF),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
-                  ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
