@@ -11,7 +11,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  # UI & Design
+  # UI & Design for
   flutter_svg: ^2.1.0
   google_fonts: ^6.3.1
   auto_size_text: ^3.0.0
