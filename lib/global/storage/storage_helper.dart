@@ -3,11 +3,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class StorageHelper {
   static const String _tokenKey = "access_token";
+  static const String _rememberMeKey = "remember_me";
 
   /// Save Token
   static Future<void> saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
-    // Trim whitespace/newlines before saving
     final safe = token.trim();
     await prefs.setString(_tokenKey, safe);
   }
@@ -23,5 +23,30 @@ class StorageHelper {
   static Future<void> clearToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_tokenKey);
+  }
+
+  /// Save Remember Me preference
+  static Future<void> saveRememberMe(bool value) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_rememberMeKey, value);
+  }
+
+  /// Get Remember Me preference
+  static Future<bool> getRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(_rememberMeKey) ?? false;
+  }
+
+  /// Clear Remember Me preference
+  static Future<void> clearRememberMe() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_rememberMeKey);
+  }
+
+  /// Check if user can use biometric login
+  static Future<bool> canUseBiometricLogin() async {
+    final token = await getToken();
+    final rememberMe = await getRememberMe();
+    return token != null && token.isNotEmpty && rememberMe;
   }
 }

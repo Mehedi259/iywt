@@ -259,11 +259,19 @@ class _LoginScreenState extends State<LoginScreen> {
           )),
         ),
         const SizedBox(width: 8),
-        Image.asset(
-          Assets.images.loginScreenFaceIcon.path,
-          width: 60,
-          height: 60,
-        ),
+        Obx(() => GestureDetector(
+          onTap: controller.canUseBiometric.value
+              ? controller.handleBiometricLogin
+              : null,
+          child: Opacity(
+            opacity: controller.canUseBiometric.value ? 1.0 : 0.5,
+            child: Image.asset(
+              Assets.images.loginScreenFaceIcon.path,
+              width: 60,
+              height: 60,
+            ),
+          ),
+        )),
       ],
     );
   }

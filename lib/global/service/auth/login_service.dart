@@ -48,6 +48,7 @@ class LoginService {
   /// Logout
   static Future<void> logout() async {
     await StorageHelper.clearToken();
+    await StorageHelper.clearRememberMe();
     developer.log('👋 User logged out', name: 'LoginService');
   }
 }
