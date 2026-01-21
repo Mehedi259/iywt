@@ -1,1 +1,188 @@
+// lib/global/controller/documents/documents_controller.dart
 
+import 'dart:io';
+import 'package:flutter/foundation.dart';
+import 'package:get/get.dart';
+
+import '../../model/documents/documents_model.dart';
+import '../../service/documents/documents_service.dart';
+
+class DocumentsController extends GetxController {
+  // Loading states
+  final isLoadingDashboard = false.obs;
+  final isLoadingDocuments = false.obs;
+  final isLoadingDetail = false.obs;
+  final isUploading = false.obs;
+
+  // Data
+  final Rx<DocumentsDashboard?> dashboard = Rx<DocumentsDashboard?>(null);
+  final Rx<DocumentTypeList?> preliminaryDocs = Rx<DocumentTypeList?>(null);
+  final Rx<DocumentTypeList?> studentDocs = Rx<DocumentTypeList?>(null);
+  final Rx<DocumentTypeList?> countryDocs = Rx<DocumentTypeList?>(null);
+  final Rx<DocumentDetail?> currentDocumentDetail = Rx<DocumentDetail?>(null);
+
+  // Current selected document ID
+  final currentDocumentId = ''.obs;
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchDocumentsDashboard();
+  }
+
+  /// Fetch Documents Dashboard
+  Future<void> fetchDocumentsDashboard() async {
+    try {
+      isLoadingDashboard.value = true;
+      final data = await DocumentsService.getDocumentsDashboard();
+      dashboard.value = data;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to load dashboard: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoadingDashboard.value = false;
+    }
+  }
+
+  /// Fetch Preliminary Documents
+  Future<void> fetchPreliminaryDocuments() async {
+    try {
+      isLoadingDocuments.value = true;
+      final data = await DocumentsService.getDocumentTypeList('Preliminary');
+      preliminaryDocs.value = data;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to load preliminary documents: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoadingDocuments.value = false;
+    }
+  }
+
+  /// Fetch Student Documents
+  Future<void> fetchStudentDocuments() async {
+    try {
+      isLoadingDocuments.value = true;
+      final data = await DocumentsService.getDocumentTypeList('Student');
+      studentDocs.value = data;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to load student documents: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoadingDocuments.value = false;
+    }
+  }
+
+  /// Fetch Country Documents
+  Future<void> fetchCountryDocuments() async {
+    try {
+      isLoadingDocuments.value = true;
+      final data = await DocumentsService.getDocumentTypeList('Country');
+      countryDocs.value = data;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to load country documents: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoadingDocuments.value = false;
+    }
+  }
+
+  /// Fetch Document Detail
+  Future<void> fetchDocumentDetail(String documentId) async {
+    try {
+      isLoadingDetail.value = true;
+      currentDocumentId.value = documentId;
+      final data = await DocumentsService.getDocumentDetail(documentId);
+      currentDocumentDetail.value = data;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to load document detail: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    } finally {
+      isLoadingDetail.value = false;
+    }
+  }
+
+  /// Upload Document
+  Future<bool> uploadDocument({
+    required String documentId,
+    required String description,
+    File? documentFile,
+    Uint8List? webFile,
+  }) async {
+    try {
+      isUploading.value = true;
+      await DocumentsService.uploadDocument(
+        documentId: documentId,
+        description: description,
+        documentFile: documentFile,
+        webFile: webFile,
+      );
+
+      Get.snackbar(
+        'Success',
+        'Document uploaded successfully',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+
+      // Refresh document detail after upload
+      await fetchDocumentDetail(documentId);
+
+      // Refresh dashboard to update counts
+      await fetchDocumentsDashboard();
+
+      return true;
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to upload document: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return false;
+    } finally {
+      isUploading.value = false;
+    }
+  }
+
+  /// Get status enum from string
+  String getStatusFromString(String status) {
+    switch (status.toLowerCase()) {
+      case 'scanapproved':
+      case 'complete':
+        return 'Complete';
+      case 'incomplete':
+      case 'partiallycomplete':
+        return 'Incomplete';
+      case 'pending':
+      case 'initial':
+        return 'Pending';
+      default:
+        return 'Pending';
+    }
+  }
+
+  /// Clear current document detail
+  void clearCurrentDocument() {
+    currentDocumentDetail.value = null;
+    currentDocumentId.value = '';
+  }
+
+  @override
+  void onClose() {
+    // Clean up if needed
+    super.onClose();
+  }
+}

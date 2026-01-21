@@ -32,4 +32,10 @@ class ApiConstants {
 
   // Technical Support Endpoint
   static const String technicalSupport = "/General/TechnicalSupport";
+
+  // Documents Endpoints
+  static const String documentsDashboard = "/LongTermStudent/DocumentsDashboard";
+  static String documentTypeList(String type) => "/LongTermStudent/DocumentTypeList/$type";
+  static String documentDetail(String id) => "/LongTermStudent/DocumentDetail/$id";
+  static String documentUpload(String id) => "/LongTermStudent/DocumentUpload/$id";
 }
