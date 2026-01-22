@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/custom_assets/assets.gen.dart';
 import '../../../core/routes/route_path.dart';
 import '../../../global/controler/settings/student_information_controler.dart';
+import '../../../global/storage/storage_helper.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -93,7 +94,6 @@ class SettingsScreen extends StatelessWidget {
             title: 'My Information',
             onTap: () => context.go(RoutePath.myInformation.addBasePath),
           ),
-          
 
           const SizedBox(height: 8),
 
@@ -193,26 +193,87 @@ class SettingsScreen extends StatelessWidget {
       builder: (BuildContext context) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Logout', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+          title: const Text(
+            'Logout',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           content: Text(
             'Are you sure you want to logout?',
-            style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey.shade700,
+            ),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text('Cancel', style: TextStyle(fontSize: 14, color: Colors.grey.shade600)),
+              child: Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.grey.shade600,
+                ),
+              ),
             ),
             ElevatedButton(
-              onPressed: () {
-                context.go(RoutePath.login.addBasePath);
-                print("Logout Clicked");
+              onPressed: () async {
+                // Close dialog first
+                Navigator.of(context).pop();
+
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF375BA4),
+                    ),
+                  ),
+                );
+
+                // Clear all stored data
+                await StorageHelper.clearToken();
+                await StorageHelper.clearRememberMe();
+
+                // Close loading dialog
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+
+                // Navigate to login screen
+                if (context.mounted) {
+                  context.go(RoutePath.login.addBasePath);
+                }
+
+                // Show success message
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Logged out successfully'),
+                      backgroundColor: Color(0xFF375BA4),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+
+                print("✅ Logout successful - Token cleared");
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF375BA4),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
-              child: const Text('Logout', style: TextStyle(fontSize: 14, color: Colors.white)),
+              child: const Text(
+                'Logout',
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ],
         );

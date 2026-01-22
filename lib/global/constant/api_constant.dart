@@ -4,10 +4,16 @@ class ApiConstants {
   // Base URL
   static const String baseUrl = "https://world-api-stg.iywt.com/api";
 
+  // Portal Base URL (for auth operations)
+  static const String portalBaseUrl = "https://world-stg.iywt.com/portal";
+
   // Auth Endpoints
   static const String login = "/Auth/login";
   static const String register = "/Auth/register";
   static const String forgotPassword = "/Auth/forgot-password";
+
+  // Portal Auth Endpoints
+  static const String portalForgotPassword = "/Identity/Account/ForgotPassword";
 
   // Home/Dashboard Endpoints
   static const String dashboard = "/LongTermStudent/Dashboard";
@@ -39,8 +45,7 @@ class ApiConstants {
   static String documentDetail(String id) => "/LongTermStudent/DocumentDetail/$id";
   static String documentUpload(String id) => "/LongTermStudent/DocumentUpload/$id";
 
-// Message Endpoints
+  // Message Endpoints
   static const String studentMessages = "/LongTermStudent/StudentMessages";
   static const String studentMessage = "/LongTermStudent/StudentMessage";
-
 }
