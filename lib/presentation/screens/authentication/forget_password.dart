@@ -37,7 +37,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       // Navigate after a short delay to show the snackbar
       Future.delayed(const Duration(seconds: 2), () {
         if (mounted) {
-          context.go(RoutePath.forgetPasswordOtp.addBasePath);
+          context.go(RoutePath.login.addBasePath);
         }
       });
     }
