@@ -1,28 +1,13 @@
 // lib/presentation/screens/massage_screen/massage_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html_core/flutter_widget_from_html_core.dart';
+import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/custom_assets/assets.gen.dart';
+import '../../../global/controler/massage/massage_controler.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
-import 'package:image_picker/image_picker.dart';
-
-// Message Model
-class Message {
-  final String message;
-  final String time;
-  final MessageType type;
-  final String? sender;
-  final bool hasAttachment;
-
-  Message({
-    required this.message,
-    required this.time,
-    required this.type,
-    this.sender,
-    this.hasAttachment = false,
-  });
-}
-
-enum MessageType { user, coach }
 
 class MessageScreen extends StatefulWidget {
   const MessageScreen({super.key});
@@ -31,105 +16,58 @@ class MessageScreen extends StatefulWidget {
   State<MessageScreen> createState() => _MessageScreenState();
 }
 
-class _MessageScreenState extends State<MessageScreen> with SingleTickerProviderStateMixin {
+class _MessageScreenState extends State<MessageScreen> {
+  final MessageController _controller = Get.put(MessageController());
   final TextEditingController _messageController = TextEditingController();
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  final List<Message> _messages = [];
-  final ImagePicker _picker = ImagePicker();
 
-  late AnimationController _searchAnimationController;
   bool _isSearchVisible = false;
 
   @override
   void initState() {
     super.initState();
-    // Initial messages load
-    _loadInitialMessages();
-
-    // Search Animation Setup
-    _searchAnimationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
+    _scrollController.addListener(_onScroll);
   }
 
-  void _loadInitialMessages() {
-    _messages.addAll([
-      Message(
-        message: "Hi Coach, I've uploaded my passport today. Can you confirm if it was submitted correctly?",
-        time: '05 SEP 2025 @ 12:58 PDT',
-        type: MessageType.user,
-        hasAttachment: true,
-      ),
-      Message(
-        message: "Hi, I've checked your documents. Your passport has been successfully submitted.",
-        time: '05 SEP 2025 @ 13:01 PDT',
-        type: MessageType.coach,
-        sender: 'Lindsey Heben - Coach',
-      ),
-      Message(
-        message: "I'm not sure which documents are still pending. Could you guide me?",
-        time: '05 SEP 2025 @ 13:02 PDT',
-        type: MessageType.user,
-      ),
-    ]);
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      _controller.loadMoreMessages(context: context);
+    }
   }
 
   void _toggleSearch() {
     setState(() {
       _isSearchVisible = !_isSearchVisible;
-      if (_isSearchVisible) {
-        _searchAnimationController.forward();
-      } else {
-        _searchAnimationController.reverse();
+      if (!_isSearchVisible) {
         _searchController.clear();
+        _controller.searchMessages('');
       }
     });
   }
 
   void _sendMessage() {
-    if (_messageController.text.trim().isEmpty) return;
-
-    setState(() {
-      _messages.add(
-        Message(
-          message: _messageController.text.trim(),
-          time: _getCurrentTime(),
-          type: MessageType.user,
+    if (_messageController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Message cannot be empty'),
+          backgroundColor: Colors.orange,
         ),
       );
-      _messageController.clear();
-    });
-
-    // Scroll to bottom after sending message
-    Future.delayed(const Duration(milliseconds: 100), () {
-      _scrollToBottom();
-    });
-  }
-
-  String _getCurrentTime() {
-    final now = DateTime.now();
-    final months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    final day = now.day.toString().padLeft(2, '0');
-    final month = months[now.month - 1];
-    final year = now.year;
-    final hour = now.hour.toString().padLeft(2, '0');
-    final minute = now.minute.toString().padLeft(2, '0');
-    return '$day $month $year @ $hour:$minute PDT';
-  }
-
-  void _scrollToBottom() {
-    if (_scrollController.hasClients) {
-      _scrollController.animateTo(
-        _scrollController.position.maxScrollExtent,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
-      );
+      return;
     }
+
+    // Directly send with subject = "Message"
+    _controller.sendMessage(
+      subject: 'Message',
+      body: _messageController.text.trim(),
+      context: context,
+    );
+
+    _messageController.clear();
   }
 
-  // Show Attachment Options Popup
   void _showAttachmentOptions(BuildContext context) {
     showDialog(
       context: context,
@@ -144,7 +82,6 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
     );
   }
 
-// Attachment Popup Widget
   Widget _buildAttachmentPopup(BuildContext context) {
     return Container(
       width: 238,
@@ -157,27 +94,28 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
             color: Color(0x3F000000),
             blurRadius: 6,
             offset: Offset(0, 4),
-            spreadRadius: 0,
           ),
         ],
       ),
       child: Column(
         children: [
-          // Upload Image Option
           InkWell(
-            onTap: () async {
+            onTap: () {
               Navigator.pop(context);
-              await _pickImage();
+              _controller.pickImage(context: context);
             },
             child: Container(
               height: 53.5,
               padding: const EdgeInsets.symmetric(horizontal: 19.71),
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     width: 24,
                     height: 24,
-                    child: Assets.images.uploadImageIcon.image(width: 24, height: 24),
+                    child: Assets.images.uploadImageIcon.image(
+                      width: 24,
+                      height: 24,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   const Text(
@@ -187,33 +125,30 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
                       fontSize: 16,
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,
-                      letterSpacing: 0.32,
                     ),
                   ),
                 ],
               ),
             ),
           ),
-          // Divider
-          Container(
-            height: 1,
-            color: Colors.grey.shade300,
-          ),
-          // Upload Attachment Option
+          Container(height: 1, color: Colors.grey.shade300),
           InkWell(
-            onTap: () async {
+            onTap: () {
               Navigator.pop(context);
-              await _pickFile();
+              _controller.pickFile(context: context);
             },
             child: Container(
               height: 52.5,
               padding: const EdgeInsets.symmetric(horizontal: 18.37),
               child: Row(
                 children: [
-                  Container(
+                  SizedBox(
                     width: 24,
                     height: 24,
-                    child: Assets.images.uploadAttachmentIcon.image(width: 24, height: 24),
+                    child: Assets.images.uploadAttachmentIcon.image(
+                      width: 24,
+                      height: 24,
+                    ),
                   ),
                   const SizedBox(width: 8),
                   const Text(
@@ -223,7 +158,6 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
                       fontSize: 16,
                       fontFamily: 'Inter',
                       fontWeight: FontWeight.w500,
-                      letterSpacing: 0.32,
                     ),
                   ),
                 ],
@@ -235,44 +169,24 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
     );
   }
 
-
-  // Pick Image from Gallery
-  Future<void> _pickImage() async {
-    try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        // Handle image upload
+  Future<void> _downloadAttachment(String url) async {
+    final uri = Uri.parse(url);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Image selected: ${image.name}'),
-            backgroundColor: const Color(0xFF5B7FBF),
+          const SnackBar(
+            content: Text('Could not open attachment'),
+            backgroundColor: Colors.red,
           ),
         );
-        // You can add logic to send image message here
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to pick image')),
-      );
     }
   }
 
-  // Pick File/Document
-  Future<void> _pickFile() async {
-    try {
-      // For file picker, you'll need file_picker package
-      // For now showing a message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('File picker functionality - Add file_picker package'),
-          backgroundColor: Color(0xFF5B7FBF),
-        ),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to pick file')),
-      );
-    }
+  String _formatTime(DateTime dateTime) {
+    return DateFormat('dd MMM yyyy @ HH:mm').format(dateTime);
   }
 
   @override
@@ -280,7 +194,6 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
     _messageController.dispose();
     _searchController.dispose();
     _scrollController.dispose();
-    _searchAnimationController.dispose();
     super.dispose();
   }
 
@@ -305,46 +218,113 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Assets.images.massageBoardSearchIcon.image(width: 24, height: 24),
+            icon: Assets.images.massageBoardSearchIcon.image(
+              width: 24,
+              height: 24,
+            ),
             onPressed: _toggleSearch,
           ),
         ],
       ),
       body: Column(
         children: [
-          Expanded(
-            child: ListView.builder(
-              controller: _scrollController,
+          if (_isSearchVisible)
+            Container(
               padding: const EdgeInsets.all(16),
-              itemCount: _messages.length,
-              itemBuilder: (context, index) {
-                final message = _messages[index];
-
-                switch (message.type) {
-                  case MessageType.user:
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildUserMessage(
-                        width: width,
-                        message: message.message,
-                        time: message.time,
-                        hasAttachment: message.hasAttachment,
-                      ),
-                    );
-                  case MessageType.coach:
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: _buildCoachMessage(
-                        width: width,
-                        message: message.message,
-                        time: message.time,
-                        sender: message.sender ?? 'Coach',
-                      ),
-                    );
-                }
-              },
+              color: Colors.white,
+              child: TextField(
+                controller: _searchController,
+                onChanged: (value) => _controller.searchMessages(value),
+                decoration: InputDecoration(
+                  hintText: 'Search messages...',
+                  prefixIcon: const Icon(Icons.search),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(25),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey.shade100,
+                ),
+              ),
             ),
+          Expanded(
+            child: Obx(() {
+              if (_controller.isLoading.value && _controller.messages.isEmpty) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final messages = _controller.filteredMessages;
+
+              if (messages.isEmpty) {
+                return const Center(
+                  child: Text('No messages found'),
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: () => _controller.loadMessages(
+                  refresh: true,
+                  context: context,
+                ),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  padding: const EdgeInsets.all(16),
+                  itemCount: messages.length +
+                      (_controller.isLoadingMore.value ? 1 : 0),
+                  itemBuilder: (context, index) {
+                    if (index == messages.length) {
+                      return const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
+                    }
+
+                    final message = messages[index];
+
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 16),
+                      child: message.isFromStudent
+                          ? _buildUserMessage(
+                        width: width,
+                        message: message,
+                      )
+                          : _buildCoachMessage(
+                        width: width,
+                        message: message,
+                      ),
+                    );
+                  },
+                ),
+              );
+            }),
           ),
+          Obx(() {
+            if (_controller.selectedFileName.value.isNotEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(8),
+                color: Colors.blue.shade50,
+                child: Row(
+                  children: [
+                    const Icon(Icons.attach_file, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _controller.selectedFileName.value,
+                        style: const TextStyle(fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: _controller.clearAttachment,
+                    ),
+                  ],
+                ),
+              );
+            }
+            return const SizedBox.shrink();
+          }),
           _buildMessageInput(width),
         ],
       ),
@@ -352,14 +332,9 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
     );
   }
 
-  // ---------------------------------------------------------
-  // USER MESSAGE (RIGHT SIDE)
-  // ---------------------------------------------------------
   Widget _buildUserMessage({
     required double width,
-    required String message,
-    required String time,
-    bool hasAttachment = false,
+    required message,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -379,68 +354,52 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                message,
-                style: const TextStyle(
+              HtmlWidget(
+                message.body,
+                textStyle: const TextStyle(
                   fontSize: 14,
                   color: Colors.white,
                   height: 1.4,
                 ),
               ),
-              if (hasAttachment) ...[
+              if (message.hasAttachment) ...[
                 const SizedBox(height: 10),
-                const Row(
-                  children: [
-                    SizedBox(width: 4),
-                    Text(
-                      '📎Attachment: UUID',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: Colors.white,
-                        decoration: TextDecoration.underline,
+                GestureDetector(
+                  onTap: () => _downloadAttachment(message.attachment!),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.attach_file, color: Colors.white, size: 16),
+                      SizedBox(width: 4),
+                      Text(
+                        'View Attachment',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ],
             ],
           ),
         ),
         const SizedBox(height: 4),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            Text(
-              time,
-              style: TextStyle(
-                fontSize: 11,
-                color: Colors.grey.shade500,
-              ),
-            ),
-            if (hasAttachment) ...[
-              const SizedBox(width: 8),
-              Text(
-                'View Attachment',
-                style: TextStyle(
-                  fontSize: 11,
-                  color: Colors.grey.shade500,
-                ),
-              ),
-            ],
-          ],
+        Text(
+          _formatTime(message.messageDate),
+          style: TextStyle(
+            fontSize: 11,
+            color: Colors.grey.shade500,
+          ),
         ),
       ],
     );
   }
 
-  // ---------------------------------------------------------
-  // COACH MESSAGE (LEFT SIDE - GREY)
-  // ---------------------------------------------------------
   Widget _buildCoachMessage({
     required double width,
-    required String message,
-    required String time,
-    required String sender,
+    required message,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -457,9 +416,9 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
               bottomLeft: Radius.circular(6),
             ),
           ),
-          child: Text(
-            message,
-            style: const TextStyle(
+          child: HtmlWidget(
+            message.body,
+            textStyle: const TextStyle(
               fontSize: 14,
               color: Colors.black87,
               height: 1.4,
@@ -469,13 +428,16 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
         const SizedBox(height: 4),
         Row(
           children: [
-            Text(
-              sender,
-              style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+            Flexible(
+              child: Text(
+                message.posterName,
+                style: TextStyle(fontSize: 11, color: Colors.grey.shade600),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
             const SizedBox(width: 8),
             Text(
-              time,
+              _formatTime(message.messageDate),
               style: TextStyle(fontSize: 11, color: Colors.grey.shade500),
             ),
           ],
@@ -483,9 +445,7 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
       ],
     );
   }
-  // ---------------------------------------------------------
-  // MESSAGE INPUT BOX
-  // ---------------------------------------------------------
+
   Widget _buildMessageInput(double width) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -537,18 +497,34 @@ class _MessageScreenState extends State<MessageScreen> with SingleTickerProvider
             ),
           ),
           const SizedBox(width: 12),
-          Container(
-            width: 48,
-            height: 48,
-            decoration: const BoxDecoration(
-              color: Color(0xFF5B7FBF),
-              shape: BoxShape.circle,
-            ),
-            child: IconButton(
-              icon: Assets.images.sendIcon.image(width: 30, height: 30),
-              onPressed: _sendMessage,
-            ),
-          ),
+          Obx(() {
+            return Container(
+              width: 48,
+              height: 48,
+              decoration: const BoxDecoration(
+                color: Color(0xFF5B7FBF),
+                shape: BoxShape.circle,
+              ),
+              child: _controller.isSending.value
+                  ? const Center(
+                child: SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    color: Colors.white,
+                    strokeWidth: 2,
+                  ),
+                ),
+              )
+                  : IconButton(
+                icon: Assets.images.sendIcon.image(
+                  width: 30,
+                  height: 30,
+                ),
+                onPressed: _sendMessage,
+              ),
+            );
+          }),
         ],
       ),
     );
