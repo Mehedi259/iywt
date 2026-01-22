@@ -1,23 +1,32 @@
+// lib/features/screens/documents/school_acceptance/school_acceptance_scanner_screen.dart
+
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:iywt/core/routes/routes.dart';
 
 import '../../../../core/custom_assets/assets.gen.dart';
 import '../../../../core/routes/route_path.dart';
+import '../../../../global/controler/documents/documents_controler.dart';
 import '../../../widgets/custom_navigation/custom_navbar.dart';
-import '../school_acceptance/school_acceptance_widget/details.dart';
-import '../school_acceptance/school_acceptance_widget/requirements.dart';
-import '../school_acceptance/school_acceptance_widget/status.dart';
-import '../school_acceptance/school_acceptance_widget/uploads.dart';
+import 'school_acceptance_widget/details.dart';
+import 'school_acceptance_widget/requirements.dart';
+import 'school_acceptance_widget/status.dart';
+import 'school_acceptance_widget/uploads.dart';
 
 class SchoolAcceptanceScannerScreen extends StatefulWidget {
   const SchoolAcceptanceScannerScreen({super.key});
 
   @override
-  State<SchoolAcceptanceScannerScreen> createState() => _SchoolAcceptanceScannerScreenState();
+  State<SchoolAcceptanceScannerScreen> createState() =>
+      _SchoolAcceptanceScannerScreenState();
 }
 
-class _SchoolAcceptanceScannerScreenState extends State<SchoolAcceptanceScannerScreen> {
+class _SchoolAcceptanceScannerScreenState
+    extends State<SchoolAcceptanceScannerScreen> {
+  final DocumentsController _controller = Get.find<DocumentsController>();
   int _selectedTabIndex = 0;
 
   @override
@@ -27,12 +36,14 @@ class _SchoolAcceptanceScannerScreenState extends State<SchoolAcceptanceScannerS
 
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
-
       appBar: AppBar(
         leading: Padding(
           padding: const EdgeInsets.all(8.0),
           child: GestureDetector(
-            onTap: () => context.go(RoutePath.country.addBasePath),
+            onTap: () {
+              _controller.clearCurrentDocument();
+              context.go(RoutePath.country.addBasePath);
+            },
             child: Container(
               decoration: BoxDecoration(
                 color: const Color(0xFFE8F3FF),
@@ -50,19 +61,21 @@ class _SchoolAcceptanceScannerScreenState extends State<SchoolAcceptanceScannerS
             ),
           ),
         ),
-        title: const Text(
-          'School Acceptance Letters',
-          style: TextStyle(
-            fontSize: 18,
-            fontFamily: 'Nunito Sans',
-            fontWeight: FontWeight.w500,
-            color: Color(0xFF1D1B20),
-          ),
-        ),
+        title: Obx(() {
+          final detail = _controller.currentDocumentDetail.value;
+          return Text(
+            detail?.title ?? 'School Acceptance Letters',
+            style: const TextStyle(
+              fontSize: 18,
+              fontFamily: 'Nunito Sans',
+              fontWeight: FontWeight.w500,
+              color: Color(0xFF1D1B20),
+            ),
+          );
+        }),
         backgroundColor: const Color(0xFFFDFDFD),
         elevation: 0,
       ),
-
       body: Column(
         children: [
           _buildTabBar(horizontalPadding),
@@ -71,17 +84,13 @@ class _SchoolAcceptanceScannerScreenState extends State<SchoolAcceptanceScannerS
           ),
         ],
       ),
-
       floatingActionButton:
       _selectedTabIndex == 3 ? _buildFloatingButtons() : null,
-
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-
       bottomNavigationBar: const CustomNavBar(currentIndex: 2),
     );
   }
 
-  // -------------------- TAB BAR --------------------
   Widget _buildTabBar(double hPadding) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: hPadding, vertical: 10),
@@ -128,11 +137,10 @@ class _SchoolAcceptanceScannerScreenState extends State<SchoolAcceptanceScannerS
     );
   }
 
-  // -------------------- TAB CONTENT --------------------
   Widget _buildTabContent(double hPadding) {
     switch (_selectedTabIndex) {
       case 0:
-        return  DetailsTab(horizontalPadding: hPadding);
+        return DetailsTab(horizontalPadding: hPadding);
       case 1:
         return RequirementsTab(horizontalPadding: hPadding);
       case 2:
@@ -144,37 +152,134 @@ class _SchoolAcceptanceScannerScreenState extends State<SchoolAcceptanceScannerS
     }
   }
 
-  // -------------------- FLOATING BUTTON --------------------
   Widget _buildFloatingButtons() {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 80), // bottom navbar er jonne space
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          FloatingActionButton(
-            heroTag: 'document',
-            backgroundColor: const Color(0xFF375BA4),
-            child: Image.asset(
-              Assets.images.uploadAttachmentIcon.path,
-              color: Colors.white,
-              width: 28,
+    return Obx(() {
+      final isUploading = _controller.isUploading.value;
+
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 80),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            FloatingActionButton(
+              heroTag: 'document',
+              backgroundColor: const Color(0xFF375BA4),
+              child: isUploading
+                  ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                ),
+              )
+                  : Image.asset(
+                Assets.images.uploadAttachmentIcon.path,
+                color: Colors.white,
+                width: 28,
+              ),
+              onPressed: isUploading ? null : _pickAndUploadDocument,
             ),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 12),
-          FloatingActionButton(
-            heroTag: 'scan',
-            backgroundColor: const Color(0xFF375BA4),
-            child: Image.asset(
-              Assets.images.scanner.path,
-              color: Colors.white,
-              width: 28,
+            const SizedBox(width: 12),
+            FloatingActionButton(
+              heroTag: 'scan',
+              backgroundColor: const Color(0xFF375BA4),
+              child: Image.asset(
+                Assets.images.scanner.path,
+                color: Colors.white,
+                width: 28,
+              ),
+              onPressed: () =>
+                  context.go(RoutePath.schoolAcceptanceScanner.addBasePath),
             ),
-            onPressed: () =>
-                context.go(RoutePath.schoolAcceptanceScanner.addBasePath),
+          ],
+        ),
+      );
+    });
+  }
+
+  Future<void> _pickAndUploadDocument() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
+      );
+
+      if (result != null && result.files.isNotEmpty) {
+        final file = result.files.first;
+
+        // Show description dialog
+        final description = await _showDescriptionDialog();
+        if (description == null || description.isEmpty) return;
+
+        final documentId = _controller.currentDocumentId.value;
+        if (documentId.isEmpty) {
+          Get.snackbar(
+            'Error',
+            'No document selected',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+          return;
+        }
+
+        // Upload the document
+        final success = await _controller.uploadDocument(
+          documentId: documentId,
+          description: description,
+          documentFile: file.path != null ? File(file.path!) : null,
+          webFile: file.bytes,
+        );
+
+        if (success && mounted) {
+          Get.snackbar(
+            'Success',
+            'Document uploaded successfully',
+            snackPosition: SnackPosition.BOTTOM,
+            backgroundColor: Colors.green,
+            colorText: Colors.white,
+          );
+        }
+      }
+    } catch (e) {
+      Get.snackbar(
+        'Error',
+        'Failed to pick file: $e',
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
+  }
+
+  Future<String?> _showDescriptionDialog() async {
+    final TextEditingController controller = TextEditingController();
+
+    return showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Document Description'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Enter document description',
+              border: OutlineInputBorder(),
+            ),
+            maxLines: 3,
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(context).pop(controller.text),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF375BA4),
+              ),
+              child: const Text('Upload'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
+import 'dart:developer' as developer;
 
 import '../../model/documents/documents_model.dart';
 import '../../service/documents/documents_service.dart';
@@ -103,9 +104,18 @@ class DocumentsController extends GetxController {
     try {
       isLoadingDetail.value = true;
       currentDocumentId.value = documentId;
+
+      developer.log('📄 Fetching document detail for ID: $documentId',
+          name: 'DocumentsController');
+
       final data = await DocumentsService.getDocumentDetail(documentId);
       currentDocumentDetail.value = data;
+
+      developer.log('✅ Document detail loaded: ${data.title}',
+          name: 'DocumentsController');
     } catch (e) {
+      developer.log('❌ Error fetching document detail: $e',
+          name: 'DocumentsController');
       Get.snackbar(
         'Error',
         'Failed to load document detail: $e',
@@ -124,7 +134,24 @@ class DocumentsController extends GetxController {
     Uint8List? webFile,
   }) async {
     try {
+      developer.log('🚀 Starting document upload',
+          name: 'DocumentsController');
+      developer.log('📄 Document ID: $documentId',
+          name: 'DocumentsController');
+      developer.log('📝 Description: $description',
+          name: 'DocumentsController');
+
+      if (documentFile != null) {
+        developer.log('📁 File path: ${documentFile.path}',
+            name: 'DocumentsController');
+        developer.log('📏 File size: ${await documentFile.length()} bytes',
+            name: 'DocumentsController');
+        developer.log('✅ File exists: ${await documentFile.exists()}',
+            name: 'DocumentsController');
+      }
+
       isUploading.value = true;
+
       await DocumentsService.uploadDocument(
         documentId: documentId,
         description: description,
@@ -132,10 +159,14 @@ class DocumentsController extends GetxController {
         webFile: webFile,
       );
 
+      developer.log('✅ Upload successful', name: 'DocumentsController');
+
       Get.snackbar(
         'Success',
         'Document uploaded successfully',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.primary,
+        colorText: Get.theme.colorScheme.onPrimary,
       );
 
       // Refresh document detail after upload
@@ -145,11 +176,16 @@ class DocumentsController extends GetxController {
       await fetchDocumentsDashboard();
 
       return true;
-    } catch (e) {
+    } catch (e, stackTrace) {
+      developer.log('❌ Upload error: $e',
+          name: 'DocumentsController', error: e, stackTrace: stackTrace);
+
       Get.snackbar(
         'Error',
         'Failed to upload document: $e',
         snackPosition: SnackPosition.BOTTOM,
+        backgroundColor: Get.theme.colorScheme.error,
+        colorText: Get.theme.colorScheme.onError,
       );
       return false;
     } finally {

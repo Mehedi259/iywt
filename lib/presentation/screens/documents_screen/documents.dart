@@ -103,9 +103,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                       context.go(RoutePath.preliminary.addBasePath);
                     },
                     iconImage: Assets.images.preliminary.provider(),
-                    iconSize: 38.16,
-                    iconLeft: 7,
-                    iconTop: 7.38,
                     progress: dashboard.preliminaryDocuments.completed,
                     total: dashboard.preliminaryDocuments.total,
                     status: _getStatus(dashboard.preliminaryDocuments.status),
@@ -119,9 +116,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                       context.go(RoutePath.student.addBasePath);
                     },
                     iconImage: Assets.images.student.provider(),
-                    iconSize: 36,
-                    iconLeft: 6,
-                    iconTop: 6.55,
                     progress: dashboard.studentDocuments.completed,
                     total: dashboard.studentDocuments.total,
                     status: _getStatus(dashboard.studentDocuments.status),
@@ -135,9 +129,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
                       context.go(RoutePath.country.addBasePath);
                     },
                     iconImage: Assets.images.country.provider(),
-                    iconSize: 36,
-                    iconLeft: 7,
-                    iconTop: 7,
                     progress: dashboard.countryDocuments.completed,
                     total: dashboard.countryDocuments.total,
                     status: _getStatus(dashboard.countryDocuments.status),
@@ -173,9 +164,6 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     required BuildContext context,
     required String title,
     required ImageProvider iconImage,
-    required double iconSize,
-    required double iconLeft,
-    required double iconTop,
     required int progress,
     required int total,
     required DocumentStatus status,
@@ -198,93 +186,87 @@ class _DocumentsScreenState extends State<DocumentsScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 353,
-        height: 119.09,
+        constraints: const BoxConstraints(
+          maxWidth: 353,
+          minHeight: 119.09,
+        ),
         decoration: BoxDecoration(
           color: const Color(0xFFF5F5F7),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Stack(
+        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 16.62),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon Container
-            Positioned(
-              left: 26,
-              top: 16.62,
-              child: Container(
-                width: iconSize,
-                height: iconSize,
-                decoration: BoxDecoration(
-                  color: isCountryFlag
-                      ? const Color(0xFFF5F5F7)
-                      : const Color(0xFF375BA4),
-                  shape: BoxShape.circle,
-                ),
+            // Icon
+            Container(
+              width: 38.16,
+              height: 38.16,
+              decoration: BoxDecoration(
+                color: isCountryFlag
+                    ? const Color(0xFFF5F5F7)
+                    : const Color(0xFF375BA4),
+                shape: BoxShape.circle,
               ),
-            ),
-            // Icon Image
-            Positioned(
-              left: 26 + iconLeft,
-              top: 16.62 + iconTop,
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: Image(
-                  image: iconImage,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            // Title
-            Positioned(
-              left: 26,
-              top: 69,
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF1D1B20),
-                ),
-              ),
-            ),
-            // Status Icon
-            if (statusImage != null)
-              Positioned(
-                left: 261,
-                top: 50,
+              child: Center(
                 child: SizedBox(
-                  width: statusIconSize,
-                  height: statusIconSize,
+                  width: 24,
+                  height: 24,
                   child: Image(
-                    image: statusImage,
+                    image: iconImage,
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
-            // Progress Text
-            Positioned(
-              left: title == 'Preliminary' ? 291 : 287,
-              top: 49,
-              child: Text(
-                '$progress/$total',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFC7C7C7),
-                ),
-              ),
             ),
-            // Chevron
-            Positioned(
-              left: title == 'Preliminary' ? 329 : 325,
-              top: 48,
-              child: const Icon(
-                Icons.chevron_right,
-                color: Color(0xFFC7C7C7),
-                size: 24,
-              ),
+            const SizedBox(height: 14),
+            // Title and Progress Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Title
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1D1B20),
+                  ),
+                ),
+                // Status, Progress, and Chevron
+                Row(
+                  children: [
+                    if (statusImage != null) ...[
+                      SizedBox(
+                        width: statusIconSize,
+                        height: statusIconSize,
+                        child: Image(
+                          image: statusImage,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                    Text(
+                      '$progress/$total',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFC7C7C7),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.chevron_right,
+                      color: Color(0xFFC7C7C7),
+                      size: 24,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),
