@@ -14,20 +14,44 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   late LoginController controller;
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+
+  bool _isEmailFocused = false;
+  bool _isPasswordFocused = false;
 
   @override
   void initState() {
     super.initState();
     controller = Get.put(LoginController());
+
+    // Listen to focus changes
+    _emailFocusNode.addListener(() {
+      setState(() {
+        _isEmailFocused = _emailFocusNode.hasFocus;
+      });
+    });
+
+    _passwordFocusNode.addListener(() {
+      setState(() {
+        _isPasswordFocused = _passwordFocusNode.hasFocus;
+      });
+    });
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Set context after widget is built
     WidgetsBinding.instance.addPostFrameCallback((_) {
       controller.setContext(context);
     });
+  }
+
+  @override
+  void dispose() {
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -102,15 +126,19 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 16),
                       _buildTextField(
                         controller: controller.emailController,
+                        focusNode: _emailFocusNode,
                         hint: 'Email',
+                        isFocused: _isEmailFocused,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 8),
                       Obx(() => _buildTextField(
                         controller: controller.passwordController,
+                        focusNode: _passwordFocusNode,
                         hint: 'Password',
+                        isFocused: _isPasswordFocused,
                         obscureText: controller.obscurePassword.value,
                         suffixIcon: IconButton(
                           icon: Icon(
@@ -123,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           onPressed: controller.togglePasswordVisibility,
                         ),
                       )),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -142,9 +170,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       const SizedBox(height: 8),
                       _buildRememberMeCheckbox(controller),
-                      const SizedBox(height: 32),
+                      const SizedBox(height: 8),
                       _buildLoginButtonRow(controller),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -158,29 +186,59 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Widget _buildTextField({
     required TextEditingController controller,
+    required FocusNode focusNode,
     required String hint,
+    required bool isFocused,
     bool obscureText = false,
     Widget? suffixIcon,
   }) {
-    return Container(
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
       height: 52.63,
       decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFC7C7C7), width: 1),
+        border: Border.all(
+          color: isFocused
+              ? const Color(0xFFFDFDFD)
+              : const Color(0xFFC7C7C7),
+          width: isFocused ? 2 : 1,
+        ),
         borderRadius: BorderRadius.circular(10),
+        color: isFocused
+            ? const Color(0xFF2E4A7F)
+            : Colors.transparent,
+        boxShadow: isFocused
+            ? [
+          BoxShadow(
+            color: const Color(0xFFFDFDFD).withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ]
+            : null,
       ),
       child: TextField(
         controller: controller,
+        focusNode: focusNode,
         obscureText: obscureText,
-        style: const TextStyle(color: Color(0xFFE7E7E7)),
+        style: const TextStyle(
+          color: Color(0xFFE7E7E7),
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
         decoration: InputDecoration(
           hintText: hint,
-          hintStyle: const TextStyle(
-            color: Color(0xFFE7E7E7),
+          hintStyle: TextStyle(
+            color: isFocused
+                ? const Color(0xFFE7E7E7).withOpacity(0.7)
+                : const Color(0xFFE7E7E7),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 16,
+          ),
           suffixIcon: suffixIcon,
         ),
       ),
