@@ -1,14 +1,33 @@
+// lib/features/screens/documents/documents_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:iywt/core/routes/routes.dart';
 import '../../../core/routes/route_path.dart';
+import '../../../global/controler/documents/documents_controler.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 import '../../../core/custom_assets/assets.gen.dart';
 
+
 enum DocumentStatus { complete, incomplete, warning }
 
-class DocumentsScreen extends StatelessWidget {
+class DocumentsScreen extends StatefulWidget {
   const DocumentsScreen({super.key});
+
+  @override
+  State<DocumentsScreen> createState() => _DocumentsScreenState();
+}
+
+class _DocumentsScreenState extends State<DocumentsScreen> {
+  final DocumentsController _controller = Get.put(DocumentsController());
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch dashboard data on init
+    _controller.fetchDocumentsDashboard();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,109 +47,138 @@ class DocumentsScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(20, 48, 20, 0),
-        child: Column(
-          children: [
-            _buildDocumentCard(
-              context: context,
-              title: 'Preliminary',
-              onTap: () => context.go(RoutePath.preliminary.addBasePath),
-              iconImage: Assets.images.preliminary.provider(),
-              iconSize: 38.16,
-              iconLeft: 7,
-              iconTop: 7.38,
-              progress: 5,
-              total: 5,
-              status: DocumentStatus.complete,
+      body: Obx(() {
+        if (_controller.isLoadingDashboard.value) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF375BA4),
             ),
-            const SizedBox(height: 12.91),
-            _buildDocumentCard(
-              context: context,
-              title: 'Student',
-              onTap: () => context.go(RoutePath.student.addBasePath),
-              iconImage: Assets.images.student.provider(),
-              iconSize: 36,
-              iconLeft: 6,
-              iconTop: 6.55,
-              progress: 3,
-              total: 5,
-              status: DocumentStatus.incomplete,
+          );
+        }
+
+        final dashboard = _controller.dashboard.value;
+        if (dashboard == null) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.error_outline,
+                  size: 64,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'No data available',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => _controller.fetchDocumentsDashboard(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF375BA4),
+                  ),
+                  child: const Text('Retry'),
+                ),
+              ],
             ),
-            const SizedBox(height: 12.91),
-            _buildDocumentCard(
-              context: context,
-              title: 'Country',
-              onTap: () => context.go(RoutePath.country.addBasePath),
-              iconImage: Assets.images.country.provider(),
-              iconSize: 36,
-              iconLeft: 7,
-              iconTop: 7,
-              progress: 2,
-              total: 5,
-              status: DocumentStatus.warning,
-              isCountryFlag: true,
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () async {
+            await _controller.fetchDocumentsDashboard();
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(20, 48, 20, 0),
+              child: Column(
+                children: [
+                  _buildDocumentCard(
+                    context: context,
+                    title: 'Preliminary',
+                    onTap: () {
+                      _controller.fetchPreliminaryDocuments();
+                      context.go(RoutePath.preliminary.addBasePath);
+                    },
+                    iconImage: Assets.images.preliminary.provider(),
+                    progress: dashboard.preliminaryDocuments.completed,
+                    total: dashboard.preliminaryDocuments.total,
+                    status: _getStatus(dashboard.preliminaryDocuments.status),
+                  ),
+                  const SizedBox(height: 12.91),
+                  _buildDocumentCard(
+                    context: context,
+                    title: 'Student',
+                    onTap: () {
+                      _controller.fetchStudentDocuments();
+                      context.go(RoutePath.student.addBasePath);
+                    },
+                    iconImage: Assets.images.student.provider(),
+                    progress: dashboard.studentDocuments.completed,
+                    total: dashboard.studentDocuments.total,
+                    status: _getStatus(dashboard.studentDocuments.status),
+                  ),
+                  const SizedBox(height: 12.91),
+                  _buildDocumentCard(
+                    context: context,
+                    title: 'Country',
+                    onTap: () {
+                      _controller.fetchCountryDocuments();
+                      context.go(RoutePath.country.addBasePath);
+                    },
+                    iconImage: Assets.images.country.provider(),
+                    progress: dashboard.countryDocuments.completed,
+                    total: dashboard.countryDocuments.total,
+                    status: _getStatus(dashboard.countryDocuments.status),
+                    isCountryFlag: true,
+                  ),
+                  const SizedBox(height: 100),
+                ],
+              ),
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      }),
       bottomNavigationBar: const CustomNavBar(currentIndex: 2),
     );
+  }
+
+  DocumentStatus _getStatus(String status) {
+    switch (status.toLowerCase()) {
+      case 'complete':
+      case 'scanapproved':
+        return DocumentStatus.complete;
+      case 'incomplete':
+      case 'partiallycomplete':
+        return DocumentStatus.incomplete;
+      case 'pending':
+      case 'initial':
+      default:
+        return DocumentStatus.warning;
+    }
   }
 
   Widget _buildDocumentCard({
     required BuildContext context,
     required String title,
     required ImageProvider iconImage,
-    required double iconSize,
-    required double iconLeft,
-    required double iconTop,
     required int progress,
     required int total,
     required DocumentStatus status,
     required VoidCallback onTap,
     bool isCountryFlag = false,
   }) {
-    // Calculate positions based on Figma design
-    double cardTop = 0;
-    double titleTop = 0;
-    double iconContainerTop = 0;
-    double progressTop = 0;
-    double statusIconTop = 0;
-    double chevronTop = 0;
-
-    if (title == 'Preliminary') {
-      cardTop = 132;
-      titleTop = 201;
-      iconContainerTop = 148.62;
-      progressTop = 181;
-      statusIconTop = 182;
-      chevronTop = 180;
-    } else if (title == 'Student') {
-      cardTop = 264;
-      titleTop = 334.55;
-      iconContainerTop = 283.55;
-      progressTop = 313;
-      statusIconTop = 316;
-      chevronTop = 312;
-    } else if (title == 'Country') {
-      cardTop = 396;
-      titleTop = 463;
-      iconContainerTop = 414;
-      progressTop = 445;
-      statusIconTop = 448;
-      chevronTop = 444;
-    }
-
-    // Status icon
     ImageProvider? statusImage;
     double statusIconSize = 20;
+
     if (status == DocumentStatus.complete) {
       statusImage = Assets.images.correct.provider();
     } else if (status == DocumentStatus.warning) {
       statusImage = Assets.images.alert.provider();
       statusIconSize = 16;
-    }else if (status == DocumentStatus.incomplete) {
+    } else if (status == DocumentStatus.incomplete) {
       statusImage = Assets.images.cross.provider();
       statusIconSize = 16;
     }
@@ -138,91 +186,87 @@ class DocumentsScreen extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: 353,
-        height: 119.09,
+        constraints: const BoxConstraints(
+          maxWidth: 353,
+          minHeight: 119.09,
+        ),
         decoration: BoxDecoration(
           color: const Color(0xFFF5F5F7),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Stack(
+        padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 16.62),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Icon Container
-            Positioned(
-              left: 26,
-              top: iconContainerTop - cardTop,
-              child: Container(
-                width: iconSize,
-                height: iconSize,
-                decoration: BoxDecoration(
-                  color: isCountryFlag ? const Color(0xFFF5F5F7) : const Color(0xFF375BA4),
-                  shape: BoxShape.circle,
-                ),
+            // Icon
+            Container(
+              width: 38.16,
+              height: 38.16,
+              decoration: BoxDecoration(
+                color: isCountryFlag
+                    ? const Color(0xFFF5F5F7)
+                    : const Color(0xFF375BA4),
+                shape: BoxShape.circle,
               ),
-            ),
-            // Icon Image
-            Positioned(
-              left: 26 + iconLeft,
-              top: iconContainerTop - cardTop + iconTop,
-              child: SizedBox(
-                width: 24,
-                height: 24,
-                child: Image(
-                  image: iconImage,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            // Title
-            Positioned(
-              left: 26,
-              top: titleTop - cardTop,
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF1D1B20),
-                ),
-              ),
-            ),
-            // Status Icon (if exists)
-            if (statusImage != null)
-              Positioned(
-                left: 261,
-                top: statusIconTop - cardTop,
+              child: Center(
                 child: SizedBox(
-                  width: statusIconSize,
-                  height: statusIconSize,
+                  width: 24,
+                  height: 24,
                   child: Image(
-                    image: statusImage,
+                    image: iconImage,
                     fit: BoxFit.contain,
                   ),
                 ),
               ),
-            // Progress Text
-            Positioned(
-              left: title == 'Preliminary' ? 291 : 287,
-              top: progressTop - cardTop,
-              child: Text(
-                '$progress/$total',
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontFamily: 'Inter',
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFFC7C7C7),
-                ),
-              ),
             ),
-            // Chevron
-            Positioned(
-              left: title == 'Preliminary' ? 329 : 325,
-              top: chevronTop - cardTop,
-              child: const Icon(
-                Icons.chevron_right,
-                color: Color(0xFFC7C7C7),
-                size: 24,
-              ),
+            const SizedBox(height: 14),
+            // Title and Progress Row
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Title
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 22,
+                    fontFamily: 'Inter',
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1D1B20),
+                  ),
+                ),
+                // Status, Progress, and Chevron
+                Row(
+                  children: [
+                    if (statusImage != null) ...[
+                      SizedBox(
+                        width: statusIconSize,
+                        height: statusIconSize,
+                        child: Image(
+                          image: statusImage,
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                    ],
+                    Text(
+                      '$progress/$total',
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.w500,
+                        color: Color(0xFFC7C7C7),
+                      ),
+                    ),
+                    const SizedBox(width: 4),
+                    const Icon(
+                      Icons.chevron_right,
+                      color: Color(0xFFC7C7C7),
+                      size: 24,
+                    ),
+                  ],
+                ),
+              ],
             ),
           ],
         ),

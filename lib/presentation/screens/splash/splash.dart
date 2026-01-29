@@ -1,6 +1,6 @@
+// lib/presentation/screens/authentication/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/custom_assets/assets.gen.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -55,18 +55,19 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
       backgroundColor: const Color(0xFF1D1B20),
       body: Stack(
+        fit: StackFit.expand,
         children: [
-          // Background Image (large circular background)
-          Positioned(
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(Assets.images.splashScreenBackground.path),
-                  fit: BoxFit.cover,
-                ),
+          // Background Image
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(Assets.images.splashScreenBackground.path),
+                fit: BoxFit.cover,
               ),
             ),
           ),
@@ -80,21 +81,11 @@ class _SplashScreenState extends State<SplashScreen>
                   opacity: _fadeAnimation,
                   child: ScaleTransition(
                     scale: _scaleAnimation,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        // Logo Text Image
-                        Container(
-                          width: 230,
-                          height: 230,
-                          decoration: BoxDecoration(
-                            image: DecorationImage(
-                              image: AssetImage(Assets.images.splashScreenLogo.path),
-                              fit: BoxFit.contain,
-                            ),
-                          ),
-                        ),
-                      ],
+                    child: Image.asset(
+                      Assets.images.splashScreenLogo.path,
+                      width: size.width * 0.6,
+                      height: size.width * 0.6,
+                      fit: BoxFit.contain,
                     ),
                   ),
                 );

@@ -1,10 +1,14 @@
 // lib/presentation/screens/settings/settings.dart
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iywt/core/routes/routes.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import '../../../core/custom_assets/assets.gen.dart';
 import '../../../core/routes/route_path.dart';
+import '../../../global/controler/settings/student_information_controler.dart';
+import '../../../global/storage/storage_helper.dart';
 import '../../widgets/custom_navigation/custom_navbar.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -12,6 +16,8 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final studentController = Get.put(StudentInformationController());
+
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
       appBar: AppBar(
@@ -28,11 +34,11 @@ class SettingsScreen extends StatelessWidget {
         elevation: 0,
         centerTitle: true,
       ),
-      body: Column(
+      body: Obx(() => Column(
         children: [
           const SizedBox(height: 24),
 
-          // ---------------- PROFILE SECTION ----------------
+          // Profile Section
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 10),
@@ -44,18 +50,24 @@ class SettingsScreen extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(99),
-                  child: Container(
-                    child: Assets.images.profilepicture.image(
-                      width: 60,
-                      height: 60,
-                      fit: BoxFit.cover,
-                    ),
+                  child: studentController.profilePhotoUrl.value.isEmpty
+                      ? Assets.images.profilepicture.image(width: 60, height: 60, fit: BoxFit.cover)
+                      : CachedNetworkImage(
+                    imageUrl: studentController.profilePhotoUrl.value,
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.cover,
+                    placeholder: (context, url) => const CircularProgressIndicator(),
+                    errorWidget: (context, url, error) =>
+                        Assets.images.profilepicture.image(width: 60, height: 60, fit: BoxFit.cover),
                   ),
                 ),
                 const SizedBox(width: 10),
-                const Text(
-                  'Abdullah Al Junaid',
-                  style: TextStyle(
+                Text(
+                  studentController.preferredNameController.text.isEmpty
+                      ? 'Student Name'
+                      : studentController.preferredNameController.text,
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF1D1B20),
@@ -68,7 +80,6 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 8),
 
-          // Divider
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             height: 0.5,
@@ -77,7 +88,6 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 18),
 
-          // ---------------- OPTIONS ----------------
           _buildSettingOption(
             context: context,
             icon: Assets.images.myInformation,
@@ -85,16 +95,8 @@ class SettingsScreen extends StatelessWidget {
             onTap: () => context.go(RoutePath.myInformation.addBasePath),
           ),
 
-          _buildSettingOption(
-            context: context,
-            icon: Assets.images.changePassword,
-            title: 'Change Password',
-            onTap: () => context.go(RoutePath.changePassword.addBasePath),
-          ),
-
           const SizedBox(height: 8),
 
-          // Divider
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 20),
             height: 0.5,
@@ -119,7 +121,6 @@ class SettingsScreen extends StatelessWidget {
 
           const Spacer(),
 
-          // ---------------- LOGOUT BUTTON ----------------
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             child: OutlinedButton(
@@ -127,9 +128,7 @@ class SettingsScreen extends StatelessWidget {
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 44),
                 side: const BorderSide(color: Color(0xFF375BA4), width: 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 padding: const EdgeInsets.symmetric(vertical: 12),
               ),
               child: const Text(
@@ -146,12 +145,11 @@ class SettingsScreen extends StatelessWidget {
 
           const SizedBox(height: 16),
         ],
-      ),
+      )),
       bottomNavigationBar: const CustomNavBar(currentIndex: 4),
     );
   }
 
-  // ---------------- OPTION TILE ----------------
   Widget _buildSettingOption({
     required BuildContext context,
     required AssetGenImage icon,
@@ -189,15 +187,12 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
-  // ---------------- LOGOUT DIALOG ----------------
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Text(
             'Logout',
             style: TextStyle(
@@ -224,9 +219,47 @@ class SettingsScreen extends StatelessWidget {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                context.go(RoutePath.login.addBasePath);
-                print("Logout Clicked");
+              onPressed: () async {
+                // Close dialog first
+                Navigator.of(context).pop();
+
+                // Show loading indicator
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const Center(
+                    child: CircularProgressIndicator(
+                      color: Color(0xFF375BA4),
+                    ),
+                  ),
+                );
+
+                // Clear all stored data
+                await StorageHelper.clearToken();
+                await StorageHelper.clearRememberMe();
+
+                // Close loading dialog
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+
+                // Navigate to login screen
+                if (context.mounted) {
+                  context.go(RoutePath.login.addBasePath);
+                }
+
+                // Show success message
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Logged out successfully'),
+                      backgroundColor: Color(0xFF375BA4),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+
+                print("✅ Logout successful - Token cleared");
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF375BA4),

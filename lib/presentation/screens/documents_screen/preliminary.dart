@@ -1,11 +1,31 @@
+// lib/features/screens/documents/preliminary_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:iywt/core/routes/routes.dart';
 import '../../../core/routes/route_path.dart';
 import '../../../core/custom_assets/assets.gen.dart';
+import '../../../global/controler/documents/documents_controler.dart';
 
-class PreliminaryScreen extends StatelessWidget {
+class PreliminaryScreen extends StatefulWidget {
   const PreliminaryScreen({super.key});
+
+  @override
+  State<PreliminaryScreen> createState() => _PreliminaryScreenState();
+}
+
+class _PreliminaryScreenState extends State<PreliminaryScreen> {
+  final DocumentsController _controller = Get.find<DocumentsController>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch preliminary documents if not already loaded
+    if (_controller.preliminaryDocs.value == null) {
+      _controller.fetchPreliminaryDocuments();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,12 +33,9 @@ class PreliminaryScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFFDFDFD),
-
-      // ------------------ APP BAR ------------------
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-
         leading: IconButton(
           icon: Image(
             image: Assets.images.backIcon.provider(),
@@ -27,7 +44,6 @@ class PreliminaryScreen extends StatelessWidget {
           ),
           onPressed: () => context.go(RoutePath.documents.addBasePath),
         ),
-
         title: const Text(
           "Preliminary",
           style: TextStyle(
@@ -36,65 +52,115 @@ class PreliminaryScreen extends StatelessWidget {
             color: Colors.black,
           ),
         ),
-
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 12),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Row(
-              children: [
-                SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: Image(image: Assets.images.cross.provider()),
-                ),
-                const SizedBox(width: 6),
-                const Text(
-                  "1/2",
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
+          Obx(() {
+            final docs = _controller.preliminaryDocs.value;
+            if (docs == null) {
+              return const SizedBox(width: 80);
+            }
+
+            final completed = docs.completed;
+            final total = docs.total;
+            final isComplete = completed == total;
+
+            return Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Row(
+                children: [
+                  SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: Image(
+                      image: isComplete
+                          ? Assets.images.correct.provider()
+                          : Assets.images.cross.provider(),
+                    ),
                   ),
+                  const SizedBox(width: 6),
+                  Text(
+                    "$completed/$total",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          })
+        ],
+      ),
+      body: Obx(() {
+        if (_controller.isLoadingDocuments.value) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF375BA4),
+            ),
+          );
+        }
+
+        final docs = _controller.preliminaryDocs.value;
+        if (docs == null || docs.documents.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.description_outlined,
+                  size: 64,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'No documents available',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => _controller.fetchPreliminaryDocuments(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF375BA4),
+                  ),
+                  child: const Text('Retry'),
                 ),
               ],
             ),
-          )
-        ],
-      ),
+          );
+        }
 
-      // ------------------ BODY ------------------
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildDocumentItem(
-              title: "Passport",
-              description:
-              "You will upload a high-quality scan of the bio-page of your passport.",
-              onPressed: () => context.go(RoutePath.passport.addBasePath),
-              isComplete: true,
-              width: width,
-            ),
-            const SizedBox(height: 16),
-
-            _buildDocumentItem(
-              title: "Birth Certificate",
-              description:
-              "You will upload a copy of your birth certificate to verify parental consent.",
-              onPressed: () => context.go(RoutePath.birthCertificateScannerScreen.addBasePath),
-              isComplete: false,
-              width: width,
-            ),
-          ],
-        ),
-      ),
+        return RefreshIndicator(
+          onRefresh: () async {
+            await _controller.fetchPreliminaryDocuments();
+          },
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: docs.documents.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final doc = docs.documents[index];
+              return _buildDocumentItem(
+                title: doc.title,
+                description: doc.shortDescription ??
+                    'You will upload documentation for ${doc.title.toLowerCase()}.',
+                onPressed: () {
+                  _controller.fetchDocumentDetail(doc.studentDocumentId);
+                  context.go(RoutePath.passport.addBasePath);
+                },
+                isComplete: doc.status.toLowerCase() == 'scanapproved' ||
+                    doc.status.toLowerCase() == 'complete',
+                width: width,
+              );
+            },
+          ),
+        );
+      }),
     );
   }
 
-  // ------------------ DOCUMENT CARD ------------------
   Widget _buildDocumentItem({
     required String title,
     required String description,
@@ -114,7 +180,6 @@ class PreliminaryScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // ---------- TEXT ----------
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -139,10 +204,7 @@ class PreliminaryScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(width: 12),
-
-            // ---------- STATUS ICON ----------
             SizedBox(
               width: 26,
               height: 26,
@@ -152,10 +214,7 @@ class PreliminaryScreen extends StatelessWidget {
                     : Assets.images.cross.provider(),
               ),
             ),
-
             const SizedBox(width: 6),
-
-            // ---------- ARROW ----------
             Icon(
               Icons.chevron_right,
               size: 26,

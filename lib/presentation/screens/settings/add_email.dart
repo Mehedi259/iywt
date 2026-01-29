@@ -1,61 +1,48 @@
-
-// ============================================
 // lib/presentation/screens/settings/add_email.dart
-// ============================================
 
 import 'package:flutter/material.dart';
-
+import 'package:get/get.dart';
 import '../../../core/custom_assets/assets.gen.dart';
+import '../../../global/controler/settings/email_controler.dart';
 
-class AddEmailScreen extends StatefulWidget {
+
+class AddEmailScreen extends StatelessWidget {
   const AddEmailScreen({super.key});
 
   @override
-  State<AddEmailScreen> createState() => _AddEmailScreenState();
-}
-
-class _AddEmailScreenState extends State<AddEmailScreen> {
-  final TextEditingController _emailController = TextEditingController(text: 'example@gmail.com');
-  String _selectedType = 'Student';
-
-  @override
   Widget build(BuildContext context) {
+    final controller = Get.find<EmailController>();
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        leading: Container(
-          child: IconButton(
-            icon: Assets.images.backIcon.image(width: 44, height: 44),
-            onPressed: () => Navigator.pop(context),
-          ),
+        leading: IconButton(
+          icon: Assets.images.backIcon.image(width: 44, height: 44),
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Text(
           'Email',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Colors.black,
-          ),
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black),
         ),
         centerTitle: true,
       ),
-      body: Padding(
+      body: Obx(() => Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
             _buildDropdownField(
               label: 'Type',
-              value: _selectedType,
-              items: ['Student', 'Personal', 'Work'],
-              onChanged: (value) => setState(() => _selectedType = value!),
+              value: controller.selectedType.value,
+              items: const ['Student', 'Personal', 'Work'],
+              onChanged: (value) => controller.selectedType.value = value!,
             ),
             const SizedBox(height: 20),
 
             _buildTextField(
               label: 'Email',
-              controller: _emailController,
+              controller: controller.emailController,
               keyboardType: TextInputType.emailAddress,
             ),
             const SizedBox(height: 40),
@@ -64,27 +51,25 @@ class _AddEmailScreenState extends State<AddEmailScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {
-                  print('Save clicked');
-                  Navigator.pop(context);
-                },
+                onPressed: controller.isLoading.value ? null : controller.saveEmail,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF5B7FBF),
                   foregroundColor: Colors.white,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text(
-                  'Save',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                ),
+                child: controller.isLoading.value
+                    ? const SizedBox(
+                  height: 24,
+                  width: 24,
+                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                )
+                    : const Text('Save', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
               ),
             ),
           ],
         ),
-      ),
+      )),
     );
   }
 
@@ -102,15 +87,9 @@ class _AddEmailScreenState extends State<AddEmailScreen> {
           controller: controller,
           keyboardType: keyboardType,
           decoration: InputDecoration(
-            border: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF5B7FBF)),
-            ),
+            border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF5B7FBF))),
           ),
         ),
       ],
@@ -131,28 +110,14 @@ class _AddEmailScreenState extends State<AddEmailScreen> {
         DropdownButtonFormField<String>(
           value: value,
           decoration: InputDecoration(
-            border: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: const UnderlineInputBorder(
-              borderSide: BorderSide(color: Color(0xFF5B7FBF)),
-            ),
+            border: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+            enabledBorder: UnderlineInputBorder(borderSide: BorderSide(color: Colors.grey.shade300)),
+            focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: Color(0xFF5B7FBF))),
           ),
-          items: items.map((String item) {
-            return DropdownMenuItem<String>(value: item, child: Text(item));
-          }).toList(),
+          items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
           onChanged: onChanged,
         ),
       ],
     );
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    super.dispose();
   }
 }

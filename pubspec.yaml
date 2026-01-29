@@ -7,10 +7,6 @@ version: 1.0.0+1
 environment:
   sdk: ^3.6.0
 
-
-###############################
-#       DEPENDENCIES
-###############################
 dependencies:
   flutter:
     sdk: flutter
@@ -20,6 +16,7 @@ dependencies:
   google_fonts: ^6.3.1
   auto_size_text: ^3.0.0
   flutter_screenutil: ^5.9.3
+  flutter_markdown: ^0.7.4+1
 
   # State Management & Routing
   get: ^4.7.2
@@ -29,6 +26,7 @@ dependencies:
   # Network & API
   http: ^1.4.0
   internet_connection_checker_plus: ^2.7.2
+  cached_network_image: ^3.4.1
 
   # Device, Files & Permissions
   image_picker: ^1.1.2
@@ -43,6 +41,7 @@ dependencies:
   # Authentication
   google_sign_in: ^6.2.1
   sign_in_with_apple: ^6.1.3
+  local_auth: ^2.3.0
 
   # Utilities
   logger: ^2.5.0
@@ -52,12 +51,10 @@ dependencies:
   device_preview: ^1.2.0
   cunning_document_scanner: ^1.3.1
   cupertino_icons: ^1.0.5
+  intl: ^0.20.2
+  path_provider: ^2.1.5
+  flutter_widget_from_html_core: ^0.17.0
 
-
-
-###############################
-#       DEV DEPENDENCIES
-###############################
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -67,30 +64,17 @@ dev_dependencies:
   flutter_gen_runner:
   flutter_launcher_icons: ^0.14.3
 
-
-
-###############################
-#       FLUTTER GEN
-###############################
 flutter_gen:
   output: lib/core/custom_assets/
   line_length: 80
   integrations:
     flutter_svg: true
 
-
-###############################
-#   FLUTTER LAUNCHER ICONS
-###############################
 flutter_launcher_icons:
   android: true
   ios:
     remove_alpha_ios: true
 
-
-###############################
-#           FLUTTER
-###############################
 flutter:
   uses-material-design: true
   generate: true

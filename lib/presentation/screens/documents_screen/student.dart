@@ -1,11 +1,31 @@
+// lib/features/screens/documents/student_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:get/get.dart';
 import 'package:iywt/core/routes/routes.dart';
 import '../../../core/routes/route_path.dart';
 import '../../../core/custom_assets/assets.gen.dart';
+import '../../../global/controler/documents/documents_controler.dart';
 
-class StudentScreen extends StatelessWidget {
+class StudentScreen extends StatefulWidget {
   const StudentScreen({super.key});
+
+  @override
+  State<StudentScreen> createState() => _StudentScreenState();
+}
+
+class _StudentScreenState extends State<StudentScreen> {
+  final DocumentsController _controller = Get.find<DocumentsController>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Fetch student documents if not already loaded
+    if (_controller.studentDocs.value == null) {
+      _controller.fetchStudentDocuments();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,69 +51,132 @@ class StudentScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         actions: [
-          Container(
-            margin: const EdgeInsets.only(right: 16),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Row(
-              children: [
-                Image(
-                  image: Assets.images.alert.provider(),
-                  height: 16,
-                  width: 16,
-                ),
-                const SizedBox(width: 4),
-                const Text(
-                  '1/2',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
+          Obx(() {
+            final docs = _controller.studentDocs.value;
+            if (docs == null) {
+              return const SizedBox(width: 80);
+            }
+
+            final completed = docs.completed;
+            final total = docs.total;
+            final isComplete = completed == total;
+            final hasWarning = completed > 0 && completed < total;
+
+            return Container(
+              margin: const EdgeInsets.only(right: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                children: [
+                  Image(
+                    image: isComplete
+                        ? Assets.images.correct.provider()
+                        : hasWarning
+                        ? Assets.images.alert.provider()
+                        : Assets.images.cross.provider(),
+                    height: 16,
+                    width: 16,
                   ),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$completed/$total',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
+        ],
+      ),
+      body: Obx(() {
+        if (_controller.isLoadingDocuments.value) {
+          return const Center(
+            child: CircularProgressIndicator(
+              color: Color(0xFF375BA4),
+            ),
+          );
+        }
+
+        final docs = _controller.studentDocs.value;
+        if (docs == null || docs.documents.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(
+                  Icons.description_outlined,
+                  size: 64,
+                  color: Colors.grey,
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'No student documents available',
+                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => _controller.fetchStudentDocuments(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF375BA4),
+                  ),
+                  child: const Text('Retry'),
                 ),
               ],
             ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: () async {
+            await _controller.fetchStudentDocuments();
+          },
+          child: ListView.separated(
+            padding: const EdgeInsets.all(16),
+            itemCount: docs.documents.length,
+            separatorBuilder: (context, index) => const SizedBox(height: 16),
+            itemBuilder: (context, index) {
+              final doc = docs.documents[index];
+              return _buildDocumentItem(
+                title: doc.title,
+                description: doc.shortDescription ??
+                    'Upload required documentation for ${doc.title.toLowerCase()}.',
+                isComplete: doc.status.toLowerCase() == 'scanapproved' ||
+                    doc.status.toLowerCase() == 'complete',
+                hasWarning: doc.status.toLowerCase() == 'pending' ||
+                    doc.status.toLowerCase() == 'partiallycomplete',
+                onTap: () {
+                  _controller.fetchDocumentDetail(doc.studentDocumentId);
+                  context.go(RoutePath.collegeCertificateScannerScreen.addBasePath);
+                },
+              );
+            },
           ),
-        ],
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            _buildDocumentItem(
-              title: 'College Certificate',
-              description:
-              'Get final certificate as soon as your final grades for the term are posted.',
-              isComplete: false,
-              icon: Assets.images.alert,
-              onTap: () => context.go(
-                  RoutePath.collegeCertificateScannerScreen.addBasePath),
-            ),
-            const SizedBox(height: 16),
-            _buildDocumentItem(
-              title: 'College Transcript',
-              description:
-              'Get final transcripts as soon as your final grades for the term are posted.',
-              isComplete: true,
-              icon: Assets.images.correct,
-              onTap: () =>
-                  context.go(RoutePath.collegeTranscriptScannerScreen.addBasePath),
-            ),
-          ],
-        ),
-      ),
+        );
+      }),
     );
   }
 
-  /// 🔥 FIXED VERSION – onTap added properly
   Widget _buildDocumentItem({
     required String title,
     required String description,
     required bool isComplete,
-    required AssetGenImage icon,
+    bool hasWarning = false,
     required VoidCallback onTap,
   }) {
+    AssetGenImage icon;
+    if (isComplete) {
+      icon = Assets.images.correct;
+    } else if (hasWarning) {
+      icon = Assets.images.alert;
+    } else {
+      icon = Assets.images.cross;
+    }
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -111,7 +194,6 @@ class StudentScreen extends StatelessWidget {
         ),
         child: Row(
           children: [
-            // TEXT BLOCK
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,18 +218,13 @@ class StudentScreen extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(width: 16),
-
-            // STATUS ICON
             Image(
               image: icon.provider(),
               height: 20,
               width: 20,
             ),
-
             const SizedBox(width: 6),
-
             Icon(
               Icons.chevron_right,
               size: 26,

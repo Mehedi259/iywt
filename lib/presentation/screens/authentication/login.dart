@@ -1,7 +1,9 @@
+// lib/presentation/screens/authentication/login.dart
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:go_router/go_router.dart';
-
 import '../../../core/custom_assets/assets.gen.dart';
+import '../../../global/controler/auth/login_controler.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -11,121 +13,50 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _rememberMe = false;
-  bool _obscurePassword = true;
+  late LoginController controller;
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+
+  bool _isEmailFocused = false;
+  bool _isPasswordFocused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    controller = Get.put(LoginController());
+
+    // Listen to focus changes
+    _emailFocusNode.addListener(() {
+      setState(() {
+        _isEmailFocused = _emailFocusNode.hasFocus;
+      });
+    });
+
+    _passwordFocusNode.addListener(() {
+      setState(() {
+        _isPasswordFocused = _passwordFocusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      controller.setContext(context);
+    });
+  }
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
+    _emailFocusNode.dispose();
+    _passwordFocusNode.dispose();
     super.dispose();
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hint,
-    bool obscureText = false,
-    Widget? suffixIcon,
-  }) {
-    return Container(
-      height: 52.63,
-      decoration: BoxDecoration(
-        border: Border.all(color: const Color(0xFFC7C7C7), width: 1),
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: obscureText,
-        style: const TextStyle(color: Color(0xFFE7E7E7)),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(
-            color: Color(0xFFE7E7E7),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
-          suffixIcon: suffixIcon,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildRememberMeCheckbox() {
-    return Row(
-      children: [
-        Container(
-          width: 15,
-          height: 15,
-          decoration: BoxDecoration(
-            color: _rememberMe ? const Color(0xFFF5F5F7) : Colors.transparent,
-            border: Border.all(color: const Color(0xFFF5F5F7), width: 1),
-            borderRadius: BorderRadius.circular(2),
-          ),
-          child: _rememberMe
-              ? const Icon(Icons.check, size: 12, color: Color(0xFF375BA4))
-              : null,
-        ),
-        const SizedBox(width: 8),
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _rememberMe = _rememberMe;
-            });
-          },
-          child: const Text(
-            'Remember me',
-            style: TextStyle(
-              color: Color(0xFFE7E7E7),
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildLoginButtonRow() {
-    return Row(
-      children: [
-        Expanded(
-          child: GestureDetector(
-            onTap: () => context.go('/home'),
-            child: Container(
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFDFDFD),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              alignment: Alignment.center,
-              child: const Text(
-                'Log in',
-                style: TextStyle(
-                  color: Color(0xFF375BA4),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(width: 8),
-        Image.asset(
-          Assets.images.loginScreenFaceIcon.path,
-          width: 60,
-          height: 60,
-        ),
-      ],
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final viewInsets = MediaQuery.of(context).viewInsets.bottom; // Keyboard height
+    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
 
     return Scaffold(
       backgroundColor: const Color(0xFF1D1B20),
@@ -173,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
               duration: const Duration(milliseconds: 300),
               left: 0,
               right: 0,
-              top: viewInsets > 0 ? 0 : 347, // Move up when keyboard opens
+              top: viewInsets > 0 ? 0 : 347,
               bottom: 0,
               child: Container(
                 decoration: const BoxDecoration(
@@ -195,27 +126,32 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 32),
-                      _buildTextField(controller: _emailController, hint: 'Email'),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 16),
                       _buildTextField(
-                        controller: _passwordController,
+                        controller: controller.emailController,
+                        focusNode: _emailFocusNode,
+                        hint: 'Email',
+                        isFocused: _isEmailFocused,
+                      ),
+                      const SizedBox(height: 8),
+                      Obx(() => _buildTextField(
+                        controller: controller.passwordController,
+                        focusNode: _passwordFocusNode,
                         hint: 'Password',
-                        obscureText: _obscurePassword,
+                        isFocused: _isPasswordFocused,
+                        obscureText: controller.obscurePassword.value,
                         suffixIcon: IconButton(
                           icon: Icon(
-                            _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                            controller.obscurePassword.value
+                                ? Icons.visibility_off
+                                : Icons.visibility,
                             color: const Color(0xFFE7E7E7),
                             size: 16,
                           ),
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
+                          onPressed: controller.togglePasswordVisibility,
                         ),
-                      ),
-                      const SizedBox(height: 16),
+                      )),
+                      const SizedBox(height: 8),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -233,10 +169,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      _buildRememberMeCheckbox(),
-                      const SizedBox(height: 32),
-                      _buildLoginButtonRow(),
-                      const SizedBox(height: 20),
+                      _buildRememberMeCheckbox(controller),
+                      const SizedBox(height: 8),
+                      _buildLoginButtonRow(controller),
+                      const SizedBox(height: 8),
                     ],
                   ),
                 ),
@@ -245,6 +181,156 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required FocusNode focusNode,
+    required String hint,
+    required bool isFocused,
+    bool obscureText = false,
+    Widget? suffixIcon,
+  }) {
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      height: 52.63,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: isFocused
+              ? const Color(0xFFFDFDFD)
+              : const Color(0xFFC7C7C7),
+          width: isFocused ? 2 : 1,
+        ),
+        borderRadius: BorderRadius.circular(10),
+        color: isFocused
+            ? const Color(0xFF2E4A7F)
+            : Colors.transparent,
+        boxShadow: isFocused
+            ? [
+          BoxShadow(
+            color: const Color(0xFFFDFDFD).withOpacity(0.3),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ]
+            : null,
+      ),
+      child: TextField(
+        controller: controller,
+        focusNode: focusNode,
+        obscureText: obscureText,
+        style: const TextStyle(
+          color: Color(0xFFE7E7E7),
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: TextStyle(
+            color: isFocused
+                ? const Color(0xFFE7E7E7).withOpacity(0.7)
+                : const Color(0xFFE7E7E7),
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 16,
+          ),
+          suffixIcon: suffixIcon,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRememberMeCheckbox(LoginController controller) {
+    return Obx(() => Row(
+      children: [
+        GestureDetector(
+          onTap: controller.toggleRememberMe,
+          child: Container(
+            width: 15,
+            height: 15,
+            decoration: BoxDecoration(
+              color: controller.rememberMe.value
+                  ? const Color(0xFFF5F5F7)
+                  : Colors.transparent,
+              border: Border.all(color: const Color(0xFFF5F5F7), width: 1),
+              borderRadius: BorderRadius.circular(2),
+            ),
+            child: controller.rememberMe.value
+                ? const Icon(Icons.check, size: 12, color: Color(0xFF375BA4))
+                : null,
+          ),
+        ),
+        const SizedBox(width: 8),
+        GestureDetector(
+          onTap: controller.toggleRememberMe,
+          child: const Text(
+            'Remember me',
+            style: TextStyle(
+              color: Color(0xFFE7E7E7),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+      ],
+    ));
+  }
+
+  Widget _buildLoginButtonRow(LoginController controller) {
+    return Row(
+      children: [
+        Expanded(
+          child: Obx(() => GestureDetector(
+            onTap: controller.isLoading.value ? null : controller.handleLogin,
+            child: Container(
+              height: 44,
+              decoration: BoxDecoration(
+                color: const Color(0xFFFDFDFD),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              alignment: Alignment.center,
+              child: controller.isLoading.value
+                  ? const SizedBox(
+                height: 20,
+                width: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    Color(0xFF375BA4),
+                  ),
+                ),
+              )
+                  : const Text(
+                'Log in',
+                style: TextStyle(
+                  color: Color(0xFF375BA4),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ),
+          )),
+        ),
+        const SizedBox(width: 8),
+        Obx(() => GestureDetector(
+          onTap: controller.canUseBiometric.value
+              ? controller.handleBiometricLogin
+              : null,
+          child: Opacity(
+            opacity: controller.canUseBiometric.value ? 1.0 : 0.5,
+            child: Image.asset(
+              Assets.images.loginScreenFaceIcon.path,
+              width: 60,
+              height: 60,
+            ),
+          ),
+        )),
+      ],
     );
   }
 }
